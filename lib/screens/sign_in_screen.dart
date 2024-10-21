@@ -22,7 +22,7 @@ class SignInScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var width=MediaQuery.of(context).size.width;
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal  :width*0.15),
+      padding: EdgeInsets.symmetric(horizontal  :width*0.25),
       child: Scaffold(
         // Solid background color
         body: Container(
@@ -126,7 +126,7 @@ class SignInScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => BlocProvider(
+                                builder: (newContext) => BlocProvider(
                                   create: (context) => SignUpBloc(),
                                   child: SignUpScreen(),
                                 ),

@@ -8,42 +8,51 @@ import '../registration/sign_up_event.dart';
 import '../registration/sign_up_state.dart';
 import 'package:flutter/material.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
   // Define the controllers for password and confirm password
   final TextEditingController _passwordController = TextEditingController();
+
   final TextEditingController _emailController = TextEditingController();
+
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  final GlobalKey<FormState> _registrationFormKey = GlobalKey();
-  ValidationUtils validationUtils = ValidationUtils();
 
-  SignUpScreen({super.key});
+  final GlobalKey<FormState> _registrationFormKey = GlobalKey();
+
+  ValidationUtils validationUtils = ValidationUtils();
 
   @override
   Widget build(BuildContext context) {
-    var width=MediaQuery.of(context).size.width;
+    var width = MediaQuery.of(context).size.width;
     return Container(
-      color: Colors.white,
+      color: Colors.transparent,
       child: Padding(
-        padding:EdgeInsets.symmetric(horizontal  :width*0.15),
+        padding: EdgeInsets.symmetric(horizontal: width * 0.25),
         child: Scaffold(
-          appBar: AppBar(title: const GradientText('registration')),
-          body: SingleChildScrollView(
-            child: Center(
-              child: Form(
-                key: _registrationFormKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildEmailField(context),
-                    SizedBox(height: 16),
-                    _buildPasswordField(context),
-                    SizedBox(height: 16),
-                    _buildConfirmPasswordField(context),
-                    SizedBox(height: 30),
-                    _buildSubmitButton(context),
-                  ],
-                ),
+          backgroundColor: Colors.white,
+          body: Center(
+            child: Form(
+              key: _registrationFormKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const GradientText('SignUp'),
+                  SizedBox(height: 30),
+                  _buildEmailField(context),
+                  SizedBox(height: 16),
+                  _buildPasswordField(context),
+                  SizedBox(height: 16),
+                  _buildConfirmPasswordField(context),
+                  SizedBox(height: 30),
+                  _buildSubmitButton(context),
+                ],
               ),
             ),
           ),
@@ -52,21 +61,14 @@ class SignUpScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSubmitButton(BuildContext context) {
-    return BlocBuilder<SignUpBloc, SignUpState>(
-      builder: (context, state) {
-        return state.isSubmitting
-            ? const CircularProgressIndicator()
-            : GradientButton(
-                text: 'Register',
-                onPressed: () {
-                  if (_registrationFormKey.currentState != null &&
-                      _registrationFormKey.currentState!.validate()) {
-                    BlocProvider.of<SignUpBloc>(context)
-                        .add(RegisterSubmitted());
-                  }
-                },
-              );
+  Widget _buildSubmitButton(BuildContext contextNew) {
+    return GradientButton(
+      text: 'Register',
+      onPressed: () {
+        if (_registrationFormKey.currentState != null &&
+            _registrationFormKey.currentState!.validate()) {
+          BlocProvider.of<SignUpBloc>(context).add(RegisterSubmitted());
+        }
       },
     );
   }
@@ -89,10 +91,10 @@ class SignUpScreen extends StatelessWidget {
 
   Widget _buildConfirmPasswordField(BuildContext context) {
     return buildTextField(
-      controller: _confirmPasswordController,
-      labelText: 'Confirm Password',
-      obscureText: true,
-      onValidate:(cPassword)=> validationUtils.validateConfirmPassword(_passwordController.text, cPassword)
-    );
+        controller: _confirmPasswordController,
+        labelText: 'Confirm Password',
+        obscureText: true,
+        onValidate: (cPassword) => validationUtils.validateConfirmPassword(
+            _passwordController.text, cPassword));
   }
 }
