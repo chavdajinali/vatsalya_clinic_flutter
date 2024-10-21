@@ -53,7 +53,7 @@ class SignUpScreen extends StatelessWidget {
   }
 
   Widget _buildSubmitButton(BuildContext context) {
-    return BlocBuilder<RegistrationBloc, SignUpState>(
+    return BlocBuilder<SignUpBloc, SignUpState>(
       builder: (context, state) {
         return state.isSubmitting
             ? const CircularProgressIndicator()
@@ -62,7 +62,7 @@ class SignUpScreen extends StatelessWidget {
                 onPressed: () {
                   if (_registrationFormKey.currentState != null &&
                       _registrationFormKey.currentState!.validate()) {
-                    BlocProvider.of<RegistrationBloc>(context)
+                    BlocProvider.of<SignUpBloc>(context)
                         .add(RegisterSubmitted());
                   }
                 },

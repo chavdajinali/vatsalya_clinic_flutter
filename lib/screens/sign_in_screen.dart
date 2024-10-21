@@ -127,7 +127,7 @@ class SignInScreen extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => BlocProvider(
-                                  create: (context) => RegistrationBloc(),
+                                  create: (context) => SignUpBloc(),
                                   child: SignUpScreen(),
                                 ),
                               ),

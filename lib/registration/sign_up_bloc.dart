@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'sign_up_event.dart';
 import 'sign_up_state.dart';
 
-class RegistrationBloc extends Bloc<RegistrationEvent, SignUpState> {
-  RegistrationBloc() : super(SignUpState.empty()) {
+class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
+  SignUpBloc() : super(SignUpState.empty()) {
     on<EmailChanged>((event, emit) {
       emit(state.copyWith(email: event.email));
     });
