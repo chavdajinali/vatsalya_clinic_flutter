@@ -1,4 +1,4 @@
-package com.vatsalyaclinic.vatsalya_clinic
+package com.vatsalyaclinic
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "420736845468",
+    "project_id": "vatsalyaclinic-7142e",
+    "storage_bucket": "vatsalyaclinic-7142e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:420736845468:android:b395abe7a79df553420f59",
+        "android_client_info": {
+          "package_name": "com.vatsalyaclinic"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD59IIHOlWWqaEjO26Qj_THMA7ppUKi6r4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
