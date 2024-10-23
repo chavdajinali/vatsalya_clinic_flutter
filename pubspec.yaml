@@ -39,7 +39,8 @@ dependencies:
   cloud_firestore: ^4.8.2
   flutter_bloc: ^8.0.0
   equatable: ^2.0.0
-
+  responsive_builder: ^0.4.1
+  shared_preferences: ^2.0.13
 
 dev_dependencies:
   flutter_test:
