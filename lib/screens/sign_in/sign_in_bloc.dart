@@ -1,5 +1,8 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vatsalya_clinic/models/user_model.dart';
+import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
+
 import 'sign_in_event.dart';
 import 'sign_in_state.dart';
 
@@ -12,7 +15,8 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
   }
 
   // This method handles the SignInRequested event
-  Future<void> _onSignInRequested(SignInRequested event, Emitter<SignInState> emit) async {
+  Future<void> _onSignInRequested(
+      SignInRequested event, Emitter<SignInState> emit) async {
     // Validate email and password
     String? validationError = _validateCredentials(event.email, event.password);
     if (validationError != null) {
@@ -27,6 +31,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
       QuerySnapshot snapshot = await _firestore
           .collection('users')
           .where('email', isEqualTo: event.email)
+          .where('password', isEqualTo: event.password)
           .limit(1)
           .get();
 
@@ -37,10 +42,16 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
 
       // Assuming the user document has a 'password' field
       var userData = snapshot.docs.first.data() as Map<String, dynamic>;
-      String storedPassword = userData['password'];
+      // String storedPassword = userData['password'];
 
-      if (event.password == storedPassword) {
+      // if (event.password == storedPassword) {
+      if (userData.isNotEmpty) {
         emit(SignInSuccess(userId: snapshot.docs.first.id));
+        storeLoginDetails(UserModel(
+            name: userData['name'],
+            email: userData['email'],
+            role: userData['role'],
+            password: userData['password']));
       } else {
         emit(SignInFailure(error: 'Incorrect password'));
       }
@@ -52,13 +63,15 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
   // Validate email and password
   String? _validateCredentials(String email, String password) {
     // Email validation
-    final emailRegex = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+    final emailRegex =
+        RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
     if (!emailRegex.hasMatch(email)) {
       return 'Invalid email format';
     }
 
     // Password validation: at least 8 characters, 1 punctuation, 1 capital letter, 1 number
-    final passwordRegex = RegExp(r'^(?=.*[A-Z])(?=.*[!@#\$&*~])(?=.*[0-9]).{8,}$');
+    final passwordRegex =
+        RegExp(r'^(?=.*[A-Z])(?=.*[!@#\$&*~])(?=.*[0-9]).{8,}$');
     if (!passwordRegex.hasMatch(password)) {
       return 'Password must be at least 8 characters long, include 1 capital letter, 1 number, and 1 punctuation mark.';
     }

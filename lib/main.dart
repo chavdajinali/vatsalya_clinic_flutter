@@ -1,36 +1,38 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vatsalya_clinic/models/user_model.dart';
 import 'package:vatsalya_clinic/screens/home/home_screen.dart';
 import 'package:vatsalya_clinic/screens/sign_in/sign_in_bloc.dart';
 import 'package:vatsalya_clinic/screens/sign_in/sign_in_screen.dart';
 import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
+
 import 'firebase_options.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Map<String, String?> loginDetails = await getLoginDetails();
+  UserModel userModel = await getLoginDetails();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp(loginDetails: loginDetails));
+  runApp(MyApp(loginDetails: userModel));
 }
 
 class MyApp extends StatelessWidget {
-  final Map<String, String?> loginDetails;
+  final UserModel loginDetails;
 
   // Ensure that the constructor accepts the 'key' parameter as well
-  const MyApp({Key? key, required this.loginDetails}) : super(key: key);
+  const MyApp({super.key, required this.loginDetails});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: (loginDetails['username'] != null && loginDetails['username']!.isNotEmpty)
-          ? HomeScreen(loginDetails: loginDetails)
+      home: (loginDetails.email.isNotEmpty)
+          ? const HomeScreen()
           : BlocProvider(
-        create: (context) => SignInBloc(),
-        child: SignInScreen(),
-      ),
+              create: (context) => SignInBloc(),
+              child: const SignInScreen(),
+            ),
     );
   }
 }

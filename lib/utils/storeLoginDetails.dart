@@ -1,20 +1,15 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vatsalya_clinic/models/user_model.dart';
 
-Future<void> storeLoginDetails(String username, String password) async {
+Future<void> storeLoginDetails(UserModel userDetails) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setString('username', username);
-  await prefs.setString('password', password);
+  await prefs.setString('user_details', jsonEncode(userDetails.toJson()));
 }
 
-Future<Map<String, String?>> getLoginDetails() async {
+Future<UserModel> getLoginDetails() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? username = prefs.getString('username');
-  String? password = prefs.getString('password');
-
-  return {
-    'username': username,
-    'password': password,
-  };
+  return UserModel.fromJson(
+      jsonDecode(prefs.getString('user_details') ?? "{}"));
 }
-

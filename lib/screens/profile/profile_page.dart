@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -22,9 +23,19 @@ class ProfilePage extends StatelessWidget {
                   color: Colors.black),
             ),
             const SizedBox(height: 20),
-            _buildUserDetailRow('Name: ', 'Dr. John Doe'),
-            _buildUserDetailRow('Email: ', 'johndoe@clinic.com'),
-            _buildUserDetailRow('Role: ', 'Admin'),
+            FutureBuilder(
+                future: getLoginDetails(),
+                builder: (context, result) {
+                  return result.hasData == false
+                      ? const CircularProgressIndicator()
+                      : Column(
+                          children: [
+                            _buildUserDetailRow('Name: ', result.data!.name),
+                            _buildUserDetailRow('Email: ', result.data!.email),
+                            _buildUserDetailRow('Role: ', result.data!.role),
+                          ],
+                        );
+                })
           ],
         ),
       ),

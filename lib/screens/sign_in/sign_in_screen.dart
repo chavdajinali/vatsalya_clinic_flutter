@@ -4,9 +4,8 @@ import 'package:vatsalya_clinic/screens/sign_in/sign_in_bloc.dart';
 import 'package:vatsalya_clinic/screens/sign_in/sign_in_event.dart';
 import 'package:vatsalya_clinic/screens/sign_in/sign_in_state.dart';
 import 'package:vatsalya_clinic/utils/GradientText.dart';
-import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
-import 'package:vatsalya_clinic/utils/textfield_builder.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
+import 'package:vatsalya_clinic/utils/textfield_builder.dart';
 import 'package:vatsalya_clinic/utils/validation_util.dart';
 
 import '../home/home_screen.dart';
@@ -45,19 +44,12 @@ class _SignInScreenState extends State<SignInScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Sign In Successful')),
                   );
-                  // Navigate to the HomeScreen after successful sign-in
-
-                  String email = _emailController.text;
-                  String password = _passwordController.text;
-
-                  storeLoginDetails(email, password);
-                  Map<String, String?> loginDetails = await getLoginDetails();
 
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => HomeScreen(
-                          loginDetails: loginDetails), // Navigate to HomeScreen
+                      builder: (context) =>
+                          HomeScreen(), // Navigate to HomeScreen
                     ),
                   );
                 } else if (state is SignInFailure) {
@@ -128,7 +120,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       const SizedBox(height: 10),
                       TextButton(
-                        child:const Text( 'New User? Create New Account'),
+                        child: const Text('New User? Create New Account'),
                         onPressed: () {
                           Navigator.push(
                             context,

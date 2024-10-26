@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vatsalya_clinic/screens/home/home_screen.dart';
 import 'package:vatsalya_clinic/screens/sign_up/sign_up_bloc.dart';
@@ -6,10 +7,8 @@ import 'package:vatsalya_clinic/screens/sign_up/sign_up_state.dart';
 import 'package:vatsalya_clinic/utils/CustomPicker.dart';
 import 'package:vatsalya_clinic/utils/GradientText.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
-import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
 import 'package:vatsalya_clinic/utils/textfield_builder.dart';
 import 'package:vatsalya_clinic/utils/validation_util.dart';
-import 'package:flutter/material.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -34,7 +33,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final List<String> roles = ['superadmin', 'admin', 'receptionist'];
   String? selectedRole;
 
-
   ValidationUtils validationUtils = ValidationUtils();
 
   @override
@@ -49,28 +47,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
             body: BlocListener<SignUpBloc, SignUpState>(
               listener: (context, state) async {
                 if (state.isSuccess) {
-                  // Registration successful, navigate to HomeScreen
-                  String email = _emailController.text;
-                  String password = _passwordController.text;
-
-                  storeLoginDetails(email, password);
-                  Map<String, String?> loginDetails = await getLoginDetails();
-
                   // Navigate to the Sign In screen
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => HomeScreen(
-                            loginDetails:
-                                loginDetails), // Navigate to HomeScreen
+                        builder: (context) =>
+                            const HomeScreen(), // Navigate to HomeScreen
                       ));
-                } else  {
+                } else {
                   if (state.isFailure) {
                     // Handle registration failure (show error message, etc.)
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                           content:
-                          Text('Registration failed. Please try again.')),
+                              Text('Registration failed. Please try again.')),
                     );
                   }
                 }
@@ -120,8 +110,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 String password = _passwordController.text;
                 String username = _userNameController.text;
 
-                BlocProvider.of<SignUpBloc>(context)
-                    .add(RegisterSubmitted(email: email, password: password,username: username,role: selectedRole.toString()));
+                BlocProvider.of<SignUpBloc>(context).add(RegisterSubmitted(
+                    email: email,
+                    password: password,
+                    username: username,
+                    role: selectedRole.toString()));
               }
             },
           );
@@ -149,14 +142,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _buildURoleField(BuildContext context) {
     return buildTextField(
         controller: TextEditingController(text: selectedRole),
-        onTap : () => CustomPicker.show( context: context,
-          items: roles,
-          title: 'Select a Role',
-          onSelected: (value) {
-            setState(() {
-              selectedRole = value;
-            });
-          }, ),
+        onTap: () => CustomPicker.show(
+              context: context,
+              items: roles,
+              title: 'Select a Role',
+              onSelected: (value) {
+                setState(() {
+                  selectedRole = value;
+                });
+              },
+            ),
         readOnly: true,
         labelText: 'Select Role',
         decoration: InputDecoration(
@@ -167,8 +162,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
-        ),
-         contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          ),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
         ),
         obscureText: false,
         onValidate: null);

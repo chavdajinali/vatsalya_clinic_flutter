@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vatsalya_clinic/screens/home/profile_page.dart';
 import 'package:vatsalya_clinic/screens/home/todays_appointment_page.dart';
 import 'package:vatsalya_clinic/screens/home/work_in_progress_page.dart';
+import 'package:vatsalya_clinic/screens/profile/profile_page.dart';
 import 'package:vatsalya_clinic/utils/ResponsiveBuilder.dart';
 
 import '../authentication_bloc/authentication_bloc.dart';
@@ -12,9 +12,9 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 
-  final Map<String, String?> loginDetails;
-
-  const HomeScreen({super.key, required this.loginDetails});
+  const HomeScreen({
+    super.key,
+  });
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -43,9 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.blue,
-            automaticallyImplyLeading: true, // Blue background for AppBar
+            automaticallyImplyLeading: false, // Blue background for AppBar
           ),
-
           body: Row(
             children: [
               _buildLeftNavigationBar(),

@@ -7,13 +7,18 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:vatsalya_clinic/main.dart';
+import 'package:vatsalya_clinic/models/user_model.dart';
+import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    UserModel userModel = await getLoginDetails();
+
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(MyApp(
+      loginDetails: userModel,
+    ));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
