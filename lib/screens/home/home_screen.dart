@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           appBar: AppBar(
             title: const Text(
-              'Clinic Dashboard',
+              'Vatsalya Speech & Hearing Clinic Dashboard',
               style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.blue,
