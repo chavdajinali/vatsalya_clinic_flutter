@@ -3,6 +3,7 @@ import 'package:vatsalya_clinic/screens/home/home_screen.dart';
 import 'package:vatsalya_clinic/screens/sign_up/sign_up_bloc.dart';
 import 'package:vatsalya_clinic/screens/sign_up/sign_up_event.dart';
 import 'package:vatsalya_clinic/screens/sign_up/sign_up_state.dart';
+import 'package:vatsalya_clinic/utils/CustomPicker.dart';
 import 'package:vatsalya_clinic/utils/GradientText.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
 import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
@@ -23,10 +24,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final TextEditingController _emailController = TextEditingController();
 
+  final TextEditingController _userNameController = TextEditingController();
+
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
   final GlobalKey<FormState> _registrationFormKey = GlobalKey();
+
+  final List<String> roles = ['superadmin', 'admin', 'receptionist'];
+  String? selectedRole;
+
 
   ValidationUtils validationUtils = ValidationUtils();
 
@@ -76,7 +83,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     children: [
                       const GradientText('New User'),
                       const SizedBox(height: 30),
+                      _buildUserNameField(context),
+                      const SizedBox(height: 16),
                       _buildEmailField(context),
+                      const SizedBox(height: 16),
+                      _buildURoleField(context),
                       const SizedBox(height: 16),
                       _buildPasswordField(context),
                       const SizedBox(height: 16),
@@ -107,8 +118,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   _registrationFormKey.currentState!.validate()) {
                 String email = _emailController.text;
                 String password = _passwordController.text;
+                String username = _userNameController.text;
+
                 BlocProvider.of<SignUpBloc>(context)
-                    .add(RegisterSubmitted(email: email, password: password));
+                    .add(RegisterSubmitted(email: email, password: password,username: username,role: selectedRole.toString()));
               }
             },
           );
@@ -123,6 +136,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
         labelText: 'Email',
         obscureText: false,
         onValidate: validationUtils.validateEmail);
+  }
+
+  Widget _buildUserNameField(BuildContext context) {
+    return buildTextField(
+        controller: _userNameController,
+        labelText: 'User Name',
+        obscureText: false,
+        onValidate: null);
+  }
+
+  Widget _buildURoleField(BuildContext context) {
+    return buildTextField(
+        controller: TextEditingController(text: selectedRole),
+        onTap : () => CustomPicker.show( context: context,
+          items: roles,
+          title: 'Select a Role',
+          onSelected: (value) {
+            setState(() {
+              selectedRole = value;
+            });
+          }, ),
+        readOnly: true,
+        labelText: 'Select Role',
+        decoration: InputDecoration(
+          labelText: "Select Role",
+          suffixIcon: const Icon(Icons.arrow_drop_down),
+          filled: true,
+          fillColor: Colors.grey[200],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+        ),
+         contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        ),
+        obscureText: false,
+        onValidate: null);
   }
 
   Widget _buildPasswordField(BuildContext context) {

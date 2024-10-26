@@ -35,6 +35,8 @@ class ConfirmPasswordChanged extends SignUpEvent {
 class RegisterSubmitted extends SignUpEvent {
   final String email;
   final String password;
+  final String username;
+  final String role;
 
-  RegisterSubmitted({required this.email, required this.password});
+  RegisterSubmitted({required this.email, required this.password,required this.username,required this.role});
 }
