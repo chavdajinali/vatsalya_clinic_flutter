@@ -5,7 +5,7 @@ class CustomPicker extends StatelessWidget {
   final String title; // Title for the picker
   final ValueChanged<String> onSelected; // Callback for when an item is selected
 
-  CustomPicker({
+  const CustomPicker({super.key,
     required this.items,
     required this.onSelected,
     this.title = 'Select an Option',
@@ -39,10 +39,10 @@ class CustomPicker extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Text(
             title,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
-        Divider(),
+        const Divider(),
         ListView.builder(
           shrinkWrap: true, // Ensure the list fits within the modal height
           itemCount: items.length,

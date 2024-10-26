@@ -41,6 +41,7 @@ dependencies:
   equatable: ^2.0.0
   responsive_builder: ^0.4.1
   shared_preferences: ^2.0.13
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

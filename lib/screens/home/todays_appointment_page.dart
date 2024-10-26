@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:vatsalya_clinic/utils/gradient_button.dart';
 
 class TodaysAppointmentPage extends StatefulWidget {
   const TodaysAppointmentPage({super.key});
@@ -18,14 +19,14 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
         Expanded(
           child: Card(
             margin: const EdgeInsets.all(16),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text(
                         'Today\'s Appointments',
@@ -35,22 +36,29 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                             color: Colors.black),
                       ),
                       const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Logic to book a new appointment
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // Button color
-                        ),
-                        child: const Text(
-                          'Book New Appointment',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
+                      GradientButton(
+                          text: 'Book New Appointment', onPressed: () {
+                            const Text('Book Appoinment Pressed');
+                      }),
+                      // ElevatedButton(
+                      //   onPressed: () {
+                      //     // Logic to book a new appointment
+                      //   },
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: Colors.blue, // Button color
+                      //   ),
+                      //   child: const Text(
+                      //     'Book New Appointment',
+                      //     style: TextStyle(color: Colors.white),
+                      //   ),
+                      // ),
                     ],
                   ),
-                  const Divider(),
-                  Expanded(
+                ),
+                const Divider(height: 1,),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection('appointments')
@@ -165,8 +173,8 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                       },
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
