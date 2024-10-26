@@ -29,7 +29,6 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
 
   final List<String> genderList = ['Male', 'Female', 'Other'];
 
-
   @override
   void initState() {
     super.initState();
@@ -39,9 +38,7 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     // var width = MediaQuery.of(context).size.width;
-
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -57,9 +54,10 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
                   return 'Please enter your name';
                 }
                 return null;
-              }, obscureText: false,
+              },
+              obscureText: false,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             buildTextField(
               controller: ageController,
               labelText: 'Age',
@@ -71,20 +69,22 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
                   return 'Please enter a valid number';
                 }
                 return null;
-              }, obscureText: false,
+              },
+              obscureText: false,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             buildTextField(
                 controller: TextEditingController(text: gender),
-                onTap: () =>
-                    CustomPicker.show(context: context,
+                onTap: () => CustomPicker.show(
+                      context: context,
                       items: genderList,
                       title: 'Select Gender',
                       onSelected: (value) {
                         setState(() {
                           gender = value;
                         });
-                      },),
+                      },
+                    ),
                 readOnly: true,
                 labelText: 'Select Gender',
                 decoration: InputDecoration(
@@ -96,13 +96,13 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 15, horizontal: 20),
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                 ),
                 obscureText: false,
                 onValidate: (value) =>
-                value == null ? 'Please select a gender' : null),
-            const SizedBox(height: 10),
+                    value == null ? 'Please select a gender' : null),
+            const SizedBox(height: 16),
             buildTextField(
               controller: mobileController,
               labelText: 'Mobile Number',
@@ -114,9 +114,10 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
                   return 'Please enter a 10-digit number';
                 }
                 return null;
-              }, obscureText: false,
+              },
+              obscureText: false,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             buildTextField(
               controller: addressController,
               labelText: 'Address',
@@ -125,15 +126,15 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
                   return 'Please enter your address';
                 }
                 return null;
-              }, obscureText: false,
+              },
+              obscureText: false,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             buildTextField(
               controller: dateController,
               labelText: 'Created Date',
               readOnly: true,
-              onValidate: (value) =>
-              value == null || value.isEmpty
+              onValidate: (value) => value == null || value.isEmpty
                   ? 'Please select a date'
                   : null,
               obscureText: false,
@@ -142,16 +143,20 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
             BlocBuilder<CreatePatientsBloc, CreatePatientsState>(
               builder: (context, state) {
                 if (state is CreatePatientsLoading) {
-                  return const Center(
-                      child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
                 return GradientButton(
                   text: 'Add Patient',
                   onPressed: () {
                     if (_createPatientsFormKey.currentState!.validate()) {
                       BlocProvider.of<CreatePatientsBloc>(context).add(
-                        CreatePatientsRequested(name: nameController.text, age: ageController.text, gender: gender.toString(), mobile: mobileController.text, address: addressController.text, createdDate: dateController.text)
-                      );
+                          CreatePatientsRequested(
+                              name: nameController.text,
+                              age: ageController.text,
+                              gender: gender.toString(),
+                              mobile: mobileController.text,
+                              address: addressController.text,
+                              createdDate: dateController.text));
                     }
                   },
                 );
