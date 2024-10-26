@@ -38,6 +38,8 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
           await FirebaseFirestore.instance.collection('users').add({
             'email': event.email,
             'password': event.password,
+            'name' : event.username,
+            'role' : event.role,
           });
           emit(state.copyWith(isSuccess: true, isSubmitting: false));
         }else{
