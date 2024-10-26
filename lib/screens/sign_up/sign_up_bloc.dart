@@ -26,11 +26,24 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       RegisterSubmitted event, Emitter<SignUpState> emit) async {
     emit(state.copyWith(isSubmitting: true));
     try {
-      await FirebaseFirestore.instance.collection('users').add({
-        'email': event.email,
-        'password': event.password,
-      });
-      emit(state.copyWith(isSuccess: true, isSubmitting: false));
+
+        // Fetch the user from Firestore
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: event.email)
+            .limit(1)
+            .get();
+
+        if (snapshot.docs.isEmpty) {
+          await FirebaseFirestore.instance.collection('users').add({
+            'email': event.email,
+            'password': event.password,
+          });
+          emit(state.copyWith(isSuccess: true, isSubmitting: false));
+        }else{
+          emit(state.copyWith(isFailure: true, isSubmitting: false));
+        }
+
     } catch (error) {
       emit(state.copyWith(isFailure: true, isSubmitting: false));
     }

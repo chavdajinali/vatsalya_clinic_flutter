@@ -57,13 +57,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             loginDetails:
                                 loginDetails), // Navigate to HomeScreen
                       ));
-                } else if (state.isFailure) {
-                  // Handle registration failure (show error message, etc.)
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content:
-                            Text('Registration failed. Please try again.')),
-                  );
+                } else  {
+                  if (state.isFailure) {
+                    // Handle registration failure (show error message, etc.)
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content:
+                          Text('Registration failed. Please try again.')),
+                    );
+                  }
                 }
               },
               child: Center(

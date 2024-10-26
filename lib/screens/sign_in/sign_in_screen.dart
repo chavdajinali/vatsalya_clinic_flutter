@@ -77,14 +77,14 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Center(child: GradientText('Welcome Back!')),
-                      const SizedBox(height: 16),
-                   /*   Center(
+                      Center(
                         child: Image.asset(
-                          'assets/images/clinic_image.png',
+                          'assets/images/logo.jpeg',
                           height: 220,
                         ),
-                      ),*/
+                      ),
+                      const Center(child: GradientText('Welcome Back!')),
+                      const SizedBox(height: 16),
                       const SizedBox(height: 20),
                       _buildEmailField(context),
                       const SizedBox(height: 20),
