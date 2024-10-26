@@ -2,43 +2,86 @@ import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
+// Dummy data
+  final String userName = "John Doe";
+  final String userEmail = "john.doe@example.com";
+  final String userRole = "Admin";
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      surfaceTintColor: Colors.white,
-      elevation: 1,
-      child: Container(
-        padding: const EdgeInsets.all(16),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Profile"),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'User Details',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
+            // Profile Picture
+            Center(
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.grey[200],
+                child: const Icon(
+                  Icons.person,
+                  size: 50,
+                  color: Colors.blueAccent,
+                ),
+              ),
             ),
             const SizedBox(height: 20),
-            _buildUserDetailRow('Name: ', 'Dr. John Doe'),
-            _buildUserDetailRow('Email: ', 'johndoe@clinic.com'),
-            _buildUserDetailRow('Role: ', 'Admin'),
+            // User Name
+            Text(
+              userName,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            // User Email
+            Text(
+              userEmail,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 8),
+            // User Role
+            Text(
+              userRole,
+              style: const TextStyle(
+                fontSize: 16,
+                fontStyle: FontStyle.italic,
+                color: Colors.blueAccent,
+              ),
+            ),
+            const SizedBox(height: 30),
+            // Edit Profile Button
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  // Add your onPressed code here
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Text(
+                  "Edit Profile",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildUserDetailRow(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Text(title, style: const TextStyle(color: Colors.black54)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
-        ],
       ),
     );
   }

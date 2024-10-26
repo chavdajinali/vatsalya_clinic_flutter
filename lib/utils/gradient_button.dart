@@ -15,8 +15,7 @@ class GradientButton extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 16,vertical: 8),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.blue, Colors.green], // Apply gradient colors here
@@ -31,7 +30,7 @@ class GradientButton extends StatelessWidget {
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 14,
           ),
         ),
       ),

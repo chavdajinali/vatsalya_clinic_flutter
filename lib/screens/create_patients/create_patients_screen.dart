@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:vatsalya_clinic/screens/create_patients/create_patients_bloc.dart';
+import 'package:vatsalya_clinic/screens/create_patients/create_patients_event.dart';
+import 'package:vatsalya_clinic/screens/create_patients/create_patients_state.dart';
+import 'package:vatsalya_clinic/utils/CustomPicker.dart';
+import 'package:vatsalya_clinic/utils/gradient_button.dart';
+import 'package:vatsalya_clinic/utils/textfield_builder.dart';
 
 class CreatePatientsScreen extends StatefulWidget {
   const CreatePatientsScreen({super.key});
@@ -9,7 +16,7 @@ class CreatePatientsScreen extends StatefulWidget {
 }
 
 class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final _createPatientsFormKey = GlobalKey<FormState>();
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
@@ -20,6 +27,9 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
   String? gender;
   final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
 
+  final List<String> genderList = ['Male', 'Female', 'Other'];
+
+
   @override
   void initState() {
     super.initState();
@@ -27,59 +37,33 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
     dateController.text = dateFormatter.format(DateTime.now());
   }
 
-  // Custom TextField builder to reuse styled TextFields
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String labelText,
-    required String? Function(String?) validator,
-    bool readOnly = false,
-    bool obscureText = false,
-    VoidCallback? onTap,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        controller: controller,
-        readOnly: readOnly,
-        obscureText: obscureText,
-        validator: validator,
-        decoration: InputDecoration(
-          labelText: labelText,
-          filled: true,
-          fillColor: Colors.grey[200], // Gray background color
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-        ),
-        onTap: onTap,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+
+    // var width = MediaQuery.of(context).size.width;
+
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Form(
-        key: _formKey,
+        key: _createPatientsFormKey,
         child: ListView(
           children: [
             buildTextField(
               controller: nameController,
               labelText: 'Name',
-              validator: (value) {
+              onValidate: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your name';
                 }
                 return null;
-              },
+              }, obscureText: false,
             ),
+            const SizedBox(height: 10),
             buildTextField(
               controller: ageController,
               labelText: 'Age',
-              validator: (value) {
+              onValidate: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your age';
                 }
@@ -87,42 +71,42 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
                   return 'Please enter a valid number';
                 }
                 return null;
-              },
+              }, obscureText: false,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: DropdownButtonFormField<String>(
-                value: gender,
-                items: ['Male', 'Female', 'Other']
-                    .map((String value) => DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    gender = value;
-                  });
-                },
+            const SizedBox(height: 10),
+            buildTextField(
+                controller: TextEditingController(text: gender),
+                onTap: () =>
+                    CustomPicker.show(context: context,
+                      items: genderList,
+                      title: 'Select Gender',
+                      onSelected: (value) {
+                        setState(() {
+                          gender = value;
+                        });
+                      },),
+                readOnly: true,
+                labelText: 'Select Gender',
                 decoration: InputDecoration(
-                  labelText: 'Gender',
+                  labelText: "Select Gender",
+                  suffixIcon: const Icon(Icons.arrow_drop_down),
                   filled: true,
                   fillColor: Colors.grey[200],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding:
-                  EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 15, horizontal: 20),
                 ),
-                validator: (value) =>
-                value == null ? 'Please select a gender' : null,
-              ),
-            ),
+                obscureText: false,
+                onValidate: (value) =>
+                value == null ? 'Please select a gender' : null),
+            const SizedBox(height: 10),
             buildTextField(
               controller: mobileController,
               labelText: 'Mobile Number',
-              validator: (value) {
+              onValidate: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your mobile number';
                 }
@@ -130,50 +114,48 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
                   return 'Please enter a 10-digit number';
                 }
                 return null;
-              },
+              }, obscureText: false,
             ),
+            const SizedBox(height: 10),
             buildTextField(
               controller: addressController,
               labelText: 'Address',
-              validator: (value) {
+              onValidate: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your address';
                 }
                 return null;
-              },
+              }, obscureText: false,
             ),
+            const SizedBox(height: 10),
             buildTextField(
               controller: dateController,
               labelText: 'Created Date',
               readOnly: true,
-              validator: (value) => value == null || value.isEmpty
+              onValidate: (value) =>
+              value == null || value.isEmpty
                   ? 'Please select a date'
                   : null,
-              onTap: () async {
-                DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2101),
-                );
-                if (pickedDate != null) {
-                  setState(() {
-                    dateController.text = dateFormatter.format(pickedDate);
-                  });
-                }
-              },
+              obscureText: false,
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Form submitted successfully')),
-                  );
-                  // Handle form submission, such as saving data
+            const SizedBox(height: 30),
+            BlocBuilder<CreatePatientsBloc, CreatePatientsState>(
+              builder: (context, state) {
+                if (state is CreatePatientsLoading) {
+                  return const Center(
+                      child: CircularProgressIndicator());
                 }
+                return GradientButton(
+                  text: 'Add Patient',
+                  onPressed: () {
+                    if (_createPatientsFormKey.currentState!.validate()) {
+                      BlocProvider.of<CreatePatientsBloc>(context).add(
+                        CreatePatientsRequested(name: nameController.text, age: ageController.text, gender: gender.toString(), mobile: mobileController.text, address: addressController.text, createdDate: dateController.text)
+                      );
+                    }
+                  },
+                );
               },
-              child: Text('Submit'),
             ),
           ],
         ),

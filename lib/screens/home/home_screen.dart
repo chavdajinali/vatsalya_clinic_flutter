@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vatsalya_clinic/screens/home/create_patients_screen.dart';
+import 'package:vatsalya_clinic/screens/create_patients/create_patients_bloc.dart';
+import 'package:vatsalya_clinic/screens/create_patients/create_patients_screen.dart';
 import 'package:vatsalya_clinic/screens/home/profile_page.dart';
 import 'package:vatsalya_clinic/screens/home/todays_appointment_page.dart';
 import 'package:vatsalya_clinic/screens/home/work_in_progress_page.dart';
@@ -23,7 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
   var pages = [
     const TodaysAppointmentPage(),
     const ProfilePage(),
-    const CreatePatientsScreen(),
+    BlocProvider(
+        create: (BuildContext context) => CreatePatientsBloc(),
+        child: const CreatePatientsScreen()),
     const WorkInProgressPage()
   ];
 
@@ -38,14 +41,38 @@ class _HomeScreenState extends State<HomeScreen> {
     return ResponsiveBuilder(
       builder: (context, sizingInformation) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text(
-              'Vatsalya Speech & Hearing Clinic Dashboard',
-              style: TextStyle(color: Colors.white),
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(45.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blue, Colors.green], // Gradient colors
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: AppBar(
+                title: const Text(
+                  'Vatsalya Speech & Hearing Clinic Dashboard',
+                  style: TextStyle(color: Colors.white),
+                ),
+                backgroundColor: Colors.transparent,
+                centerTitle: false,
+                // Make AppBar transparent
+                elevation: 0,
+                // Remove shadow
+                automaticallyImplyLeading: false, // Allows the back button
+              ),
             ),
-            backgroundColor: Colors.blue,
-            automaticallyImplyLeading: true, // Blue background for AppBar
           ),
+          // AppBar(
+          //   title: const Text(
+          //     'Vatsalya Speech & Hearing Clinic Dashboard',
+          //     style: TextStyle(color: Colors.white),
+          //   ),
+          //   backgroundColor: Colors.blue,
+          //   automaticallyImplyLeading: true, // Blue background for AppBar
+          // ),
 
           body: Row(
             children: [
@@ -87,37 +114,48 @@ class _HomeScreenState extends State<HomeScreen> {
       {bool isSignOut = false}) {
     bool isSelected = _selectedIndex == index;
     return InkWell(
-      onTap: () {
-        if (isSignOut) {
-          BlocProvider.of<AuthenticationBloc>(context).add(SignOutEvent());
-        } else {
-          _onItemTapped(index);
-        }
-      },
-      child: Container(
-        decoration: BoxDecoration(
-            color: isSelected ? Colors.blue : Colors.white,
+        onTap: () {
+          if (isSignOut) {
+            BlocProvider.of<AuthenticationBloc>(context).add(SignOutEvent());
+          } else {
+            _onItemTapped(index);
+          }
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: isSelected
+                ? const LinearGradient(
+                    colors: [Colors.blue, Colors.green], // Gradient colors
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            // No gradient if not selected
+            color: isSelected ? null : Colors.white,
+            // Set color to white if not selected
             border: Border.all(
-                color: isSelected ? Colors.white : Colors.grey.shade500),
+              color: isSelected ? Colors.white : Colors.grey.shade500,
+            ),
             shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(10.0)),
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Row(
-            children: [
-              Icon(icon, color: isSelected ? Colors.white : Colors.grey),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.grey,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(10.0),
           ),
-        ),
-      ),
-    );
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              children: [
+                Icon(icon, color: isSelected ? Colors.white : Colors.grey),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Colors.grey,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 }
