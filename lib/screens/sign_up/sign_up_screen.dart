@@ -103,6 +103,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         } else {
           return GradientButton(
             text: 'Signup',
+            padding: EdgeInsets.all(12.0),
             onPressed: () {
               if (_registrationFormKey.currentState != null &&
                   _registrationFormKey.currentState!.validate()) {

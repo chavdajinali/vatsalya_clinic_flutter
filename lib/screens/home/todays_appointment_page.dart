@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vatsalya_clinic/screens/book_appoinment/book_appoinment_screen.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
 
 class TodaysAppointmentPage extends StatefulWidget {
@@ -38,20 +40,11 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                       const SizedBox(height: 16),
                       GradientButton(
                           text: 'Book New Appointment', onPressed: () {
-                            const Text('Book Appoinment Pressed');
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => BookAppoinmentScreen()));
+                        // BlocProvider(
+                        //     create: (BuildContext context) => CreatePatientsBloc(),
+                        //     child: const CreatePatientsScreen()),
                       }),
-                      // ElevatedButton(
-                      //   onPressed: () {
-                      //     // Logic to book a new appointment
-                      //   },
-                      //   style: ElevatedButton.styleFrom(
-                      //     backgroundColor: Colors.blue, // Button color
-                      //   ),
-                      //   child: const Text(
-                      //     'Book New Appointment',
-                      //     style: TextStyle(color: Colors.white),
-                      //   ),
-                      // ),
                     ],
                   ),
                 ),
@@ -71,7 +64,6 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                           return const Center(
                               child: CircularProgressIndicator());
                         }
-
                         // Extract documents from snapshot
                         var appointments = snapshot.data!.docs;
 

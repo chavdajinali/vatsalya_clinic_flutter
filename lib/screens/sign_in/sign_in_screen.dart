@@ -89,6 +89,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                 child: CircularProgressIndicator());
                           }
                           return GradientButton(
+                            padding: EdgeInsets.all(12.0),
                             text: 'Sign In',
                             onPressed: () {
                               if (_signInFormKey.currentState!.validate()) {

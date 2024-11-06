@@ -146,6 +146,7 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 return GradientButton(
+                  padding: const EdgeInsets.all(12.0),
                   text: 'Add Patient',
                   onPressed: () {
                     if (_createPatientsFormKey.currentState!.validate()) {
