@@ -1,8 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/screens/book_appoinment/book_appoinment_screen.dart';
+import 'package:vatsalya_clinic/screens/report/reportScreen.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
+import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
+import '../payment/payment_dialog.dart';
 
 class TodaysAppointmentPage extends StatefulWidget {
   const TodaysAppointmentPage({super.key});
@@ -12,12 +17,53 @@ class TodaysAppointmentPage extends StatefulWidget {
 }
 
 class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
+  List<AppointmentModel> appoinmentList = [];
+  List<AppointmentModel> fetchedList = [];
+
+  Future<void> _loadAppoinmentDetails() async {
+    fetchedList = await getAppoinmentFromFirestore();
+
+    // Temporary list to store the updated appointment data
+    List<AppointmentModel> updatedList = [];
+
+    for (var appointment in fetchedList) {
+      // Fetch the patient details from patients_tbl using patientName as the document ID
+      DocumentSnapshot patientSnapshot = await FirebaseFirestore.instance
+          .collection('patients_tbl')
+          .doc(appointment.patientName) // Assuming this is the document ID in patients_tbl
+          .get();
+
+      // Check if the document exists and get the name field from patients_tbl
+      if (patientSnapshot.exists) {
+        var patientName = patientSnapshot['name']; // Field name in patients_tbl
+        appointment = appointment.copyWith(patientName: patientName); // Update the appointment with the patient's actual name
+      }
+
+      // Add the updated appointment to the list
+      updatedList.add(appointment);
+    }
+
+    setState(() {
+      appoinmentList = [];
+      appoinmentList = updatedList;
+    });
+    if (kDebugMode) {
+      print(appoinmentList);
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadAppoinmentDetails();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // const SizedBox(height: 20),
         Expanded(
           child: Card(
             margin: const EdgeInsets.all(16),
@@ -39,128 +85,138 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                       ),
                       const SizedBox(height: 16),
                       GradientButton(
-                          text: 'Book New Appointment', onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => BookAppoinmentScreen()));
-                        // BlocProvider(
-                        //     create: (BuildContext context) => CreatePatientsBloc(),
-                        //     child: const CreatePatientsScreen()),
-                      }),
+                        text: 'Book New Appointment',
+                        onPressed: () async {
+                          // Navigate to the new screen and wait for it to return
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BookAppoinmentScreen(),
+                            ),
+                          );
+
+                          // Reload the appointments after coming back
+                          _loadAppoinmentDetails();
+                        },
+                      ),
                     ],
                   ),
                 ),
-                const Divider(height: 1,),
+                const Divider(height: 1),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('appointments')
-                          .where('date',
-                          isEqualTo: DateTime.now().toString().substring(
-                              0, 10)) // Filter today's appointments
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        }
-                        // Extract documents from snapshot
-                        var appointments = snapshot.data!.docs;
-
-                        // If no appointments, use dummy data
-                        List<Map<String, dynamic>> displayedAppointments;
-                        if (appointments.isEmpty) {
-                          displayedAppointments = [
-                            {'patientName': 'Alice Smith', 'date' : '23/10/2024','time': '10:00 AM'},
-                            {'patientName': 'Bob Johnson','date' : '23/10/2024' ,'time': '11:00 AM'},
-                            {'patientName': 'Charlie Brown','date' : '23/10/2024','time': '12:00 PM'},
-                          ];
-                        } else {
-                          // Extract data from documents
-                          displayedAppointments = appointments.map((doc) {
-                            var data = doc.data() as Map<String, dynamic>;
-                            return {
-                              'patientName': data['patientName'] ?? 'Unknown',
-                              'time': data['time'] ?? 'Unknown',
-                            };
-                          }).toList();
-                        }
-
-                        return ListView.separated(
-                          itemCount: displayedAppointments.length,
-                          separatorBuilder: (context, index) =>
-                          const Divider(height: 1, color: Colors.transparent),
-                          itemBuilder: (context, index) {
-                            var appointment = displayedAppointments[index];
-                            return Card(
-                              color: Colors.grey[100],
-                              child: Padding(padding: const EdgeInsets.all(12.0),
-                                child:  Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                    child: appoinmentList.isEmpty
+                        ? const Center(
+                      child: Text('No Data Found.',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                          )),
+                    )
+                        : ListView.separated(
+                      itemCount: appoinmentList.length,
+                      separatorBuilder: (context, index) =>
+                      const Divider(height: 1, color: Colors.transparent),
+                      itemBuilder: (context, index) {
+                        var appointment = appoinmentList[index];
+                        var fetchedData = fetchedList[index];
+                        return Card(
+                          color: Colors.grey[100],
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              const Text(
-                                                'Name: ',
-                                                style: TextStyle(fontWeight: FontWeight.bold),
-                                              ),
-                                              Text(
-                                                appointment['patientName'],
-                                                style: const TextStyle(fontWeight: FontWeight.normal),
-                                                overflow: TextOverflow.ellipsis, // Handles long names
-                                              ),
-                                            ],
-                                          )
-                                          ,
-                                          const SizedBox(height: 8),
-                                          Row(
-                                            children: [
-                                              Text('Date: ${appointment['date']} ${appointment['time']}',
-                                                style: const TextStyle(color: Colors.black54),
-                                              ),
-
-                                            ],
+                                          const Text(
+                                            'Name: ',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
                                           ),
-
+                                          Text(
+                                            '${appointment.patientName}',
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ],
                                       ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Date: ${appointment.appointmentDate} ${appointment.appointmentTime}',
+                                        style: const TextStyle(
+                                            color: Colors.black54),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ReportScreen(fetchedData),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                            borderRadius:
+                                            const BorderRadius.all(
+                                                Radius.circular(10.0))),
+                                        child: const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16.0,
+                                              vertical: 10.0),
+                                          child: Text('Add Details',
+                                              style: TextStyle(
+                                                  color: Colors.blue)),
+                                        ),
+                                      ),
                                     ),
-
-                                    const SizedBox(height: 16), // Space between info and button
-                                    // Button Section
-                                    Row(
-                                      children: [
-                                        TextButton(
-                                          onPressed: () {
-                                            // Handle button press
+                                    TextButton(
+                                      onPressed:() {
+                                        // Call the PaymentDialog function to show the dialog
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return PaymentDialog(); // Display the dialog
                                           },
-                                          // style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                                          child: const Padding(
-                                            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-                                            child: Text('Add Details',style: TextStyle(color: Colors.blue)),
-                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                            borderRadius:
+                                            const BorderRadius.all(
+                                                Radius.circular(10.0))),
+                                        child: const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16.0,
+                                              vertical: 10.0),
+                                          child: Text('Payment',
+                                              style: TextStyle(
+                                                  color: Colors.blue)),
                                         ),
-                                        TextButton(
-                                          onPressed: () {
-                                            // Handle button press
-                                          },
-                                          child: const Padding(
-                                            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-                                            child: Text('Payment' ,style: TextStyle(color: Colors.blue)),
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            );
-                          },
+                              ],
+                            ),
+                          ),
                         );
                       },
                     ),

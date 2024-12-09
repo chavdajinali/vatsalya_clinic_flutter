@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:vatsalya_clinic/models/appointment_model.dart';
 
 class Addbookappoinmentfirestoreservice {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -10,19 +11,26 @@ class Addbookappoinmentfirestoreservice {
     String? reference_by,
     required String chief_complain,
   }) async {
+
+    AppointmentModel newAppointment = AppointmentModel(
+      patientName: patients_name,
+      appointmentDate: appoinment_date,
+      appointmentTime: appoinment_time,
+      appointmentReferenceBy: reference_by,
+      appointmentChiefComplain : chief_complain,
+    );
+
     try {
-      await _firestore.collection('appointment_tbl').add({
-        'patients_name': patients_name,
-        'appoinment_time': appoinment_time,
-        'appoinment_date': appoinment_date,
-        'reference_by': reference_by,
-        'chief_complain': chief_complain, // Store date as ISO string
-      });
-      print("Appoinment Book successfully!");
-      return null;
+      await FirebaseFirestore.instance.collection('appointment_tbl').add(newAppointment.toJson());
+      print('Appointment added successfully!');
+      return 'Appointment added successfully!';
     } catch (e) {
-      print("Error Book Appoinment: $e");
-      return "Error Book Appoinment: $e";
+      print('Error adding appointment: $e');
+      return 'Error adding appointment: $e';
     }
+
   }
 }
+
+
+

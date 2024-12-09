@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vatsalya_clinic/screens/create_patients/create_patients_bloc.dart';
 import 'package:vatsalya_clinic/screens/create_patients/create_patients_screen.dart';
+import 'package:vatsalya_clinic/screens/history_patients_list/history_patients_list_screen.dart';
 import 'package:vatsalya_clinic/screens/home/todays_appointment_page.dart';
 import 'package:vatsalya_clinic/screens/home/work_in_progress_page.dart';
 import 'package:vatsalya_clinic/screens/profile/profile_page.dart';
@@ -27,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
     BlocProvider(
         create: (BuildContext context) => CreatePatientsBloc(),
         child: const CreatePatientsScreen()),
-    const WorkInProgressPage()
+    const HistoryPatientsListScreen()
   ];
 
   void _onItemTapped(int index) {

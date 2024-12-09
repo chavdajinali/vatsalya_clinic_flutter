@@ -14,38 +14,58 @@ class CreatePatientsBloc
   }
 
   // This method handles the SignInRequested event
-  Future<void> _onCreatePatientsRequested(CreatePatientsRequested event,
+  Future<String?> _onCreatePatientsRequested(CreatePatientsRequested event,
       Emitter<CreatePatientsState> emit) async {
-    // Validate email and password
+    print("CreatePatientsRequested triggered");
+
+    // Validate patient details
     String? validationError = _validatePatientDetails(
         event.name, event.age, event.gender, event.mobile, event.address);
     if (validationError != null) {
       emit(CreatePatientsValidationError(error: validationError));
-      return;
+      return 'validation error.';
     }
 
     emit(CreatePatientsLoading());
 
     try {
-      var result = await AddPatientsFirestoreService().addPatient(
-          name: event.name,
-          age: event.age,
-          gender: event.gender,
-          mobile: event.mobile,
-          createdDate: event.createdDate,
-          address: event.address); // Fetch the user from Firestore
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('patients_tbl')
+          .where('mobile', isEqualTo: event.mobile)
+          .limit(1) // Limit to 1 result for efficiency
+          .get();
 
-      // Check if the result is null, which indicates success
-      if (result != null) {
-        emit(CreatePatientsFailure(
-            error: result)); // Emit failure with the error message
-      } else {
-        emit(CreatePatientsSuccess()); // Emit success if the result is null
+      if (querySnapshot.docs.isNotEmpty) {
+        emit(CreatePatientsFailure(error: 'Patients is Already registered with this mobile number.'));
+        return 'Patients is Already registered.';
+      }else{
+        try {
+          var result = await AddPatientsFirestoreService().addPatient(
+              name: event.name,
+              age: event.age,
+              gender: event.gender,
+              mobile: event.mobile,
+              createdDate: event.createdDate,
+              address: event.address);
+
+          if (result != 'success') {
+            emit(CreatePatientsFailure(error: result ?? ""));
+            return result;
+          } else {
+            emit(CreatePatientsSuccess());
+            return result;
+          }
+        } catch (e) {
+          emit(CreatePatientsFailure(error: 'Error: ${e.toString()}'));
+          return 'Error: ${e.toString()}';
+        }
       }
-    }catch (e) {
-      emit(CreatePatientsFailure(error: 'Error: ${e.toString()}'));
+
+    } catch (e) {
+      return 'Error: ${e.toString()}';
     }
   }
+
 
   String? _validatePatientDetails(String name, String age, String gender,
       String mobile, String address) {

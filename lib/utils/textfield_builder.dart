@@ -8,8 +8,9 @@ Widget buildTextField({
       String? Function(String?)? onValidate,
       bool? readOnly,
       InputDecoration? decoration,
-      Function()? onTap}) {
+      Function()? onTap, TextInputType? keyboardType}) {
         return TextFormField(
+          keyboardType: keyboardType,
           controller: controller,
           decoration: decoration ?? InputDecoration(
             labelText: labelText,

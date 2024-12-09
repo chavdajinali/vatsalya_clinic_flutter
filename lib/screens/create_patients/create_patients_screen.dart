@@ -36,6 +36,16 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
     dateController.text = dateFormatter.format(DateTime.now());
   }
 
+  void resetForm() {
+    setState(() {
+      nameController.clear();
+      ageController.clear();
+      gender = null;
+      mobileController.clear();
+      addressController.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // var width = MediaQuery.of(context).size.width;
@@ -140,29 +150,43 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
               obscureText: false,
             ),
             const SizedBox(height: 30),
-            BlocBuilder<CreatePatientsBloc, CreatePatientsState>(
-              builder: (context, state) {
-                if (state is CreatePatientsLoading) {
-                  return const Center(child: CircularProgressIndicator());
+            BlocListener<CreatePatientsBloc, CreatePatientsState>(
+              listener: (ctx, state) {
+                if (state is CreatePatientsSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text("Patient added successfully!")),
+                  );
+                  resetForm();
+
+                  // Optionally clear form fields here
+                } else if (state is CreatePatientsFailure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(state.error)),
+                  );
                 }
-                return GradientButton(
-                  padding: const EdgeInsets.all(12.0),
-                  text: 'Add Patient',
-                  onPressed: () {
-                    if (_createPatientsFormKey.currentState!.validate()) {
-                      BlocProvider.of<CreatePatientsBloc>(context).add(
-                          CreatePatientsRequested(
-                              name: nameController.text,
-                              age: ageController.text,
-                              gender: gender.toString(),
-                              mobile: mobileController.text,
-                              address: addressController.text,
-                              createdDate: dateController.text));
-                    }
-                  },
-                );
               },
-            ),
+              child: BlocBuilder<CreatePatientsBloc, CreatePatientsState>(
+                builder: (context, state) {
+                  return GradientButton(
+                    padding: const EdgeInsets.all(12.0),
+                    text: 'Add Patient',
+                    onPressed: () {
+                      if (_createPatientsFormKey.currentState!.validate()) {
+                        BlocProvider.of<CreatePatientsBloc>(context).add(
+                            CreatePatientsRequested(
+                                name: nameController.text,
+                                age: ageController.text,
+                                gender: gender.toString(),
+                                mobile: mobileController.text,
+                                address: addressController.text,
+                                createdDate: dateController.text));
+                      }
+                    },
+                  );
+                },
+              ),
+            )
           ],
         ),
       ),
