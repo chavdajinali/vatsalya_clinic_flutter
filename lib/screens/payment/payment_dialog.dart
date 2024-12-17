@@ -1,11 +1,14 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:vatsalya_clinic/screens/payment/payment_firestore_service.dart';
 import 'package:vatsalya_clinic/utils/CustomPicker.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
 import 'package:vatsalya_clinic/utils/textfield_builder.dart';
 
 class PaymentDialog extends StatefulWidget {
-  const PaymentDialog({super.key});
+  final patientsId;
+  final appoinmentDate;
+  const PaymentDialog({super.key, this.patientsId, this.appoinmentDate});
 
   @override
   State<PaymentDialog> createState() => _PaymentDialogState();
@@ -24,6 +27,45 @@ class _PaymentDialogState extends State<PaymentDialog> {
     setState(() {
       _isPaymentDialogVisible = !_isPaymentDialogVisible; // Toggle visibility
     });
+  }
+
+  Future<void> _AddPaymentData() async {
+
+    // Check if all required fields are selected
+    if (widget.patientsId.toString() != null &&
+        widget.appoinmentDate.toString() != null &&
+        selectedPaymentType != null) {
+      String? result = await PaymentFirestoreService().addPaymentData(
+        patients_id: widget.patientsId.toString(),
+        payment_amount: _amountController.text,
+        payment_type: selectedPaymentType.toString(),
+        appoinmentDate: widget.appoinmentDate.toString(),
+      );
+
+      // Show SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result ?? "Something went wrong!"),
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      // Clear fields if the booking was successful
+      if (result == "Payment added successfully!") {
+        setState(() {
+          // _togglePaymentDialog();
+          Navigator.of(context).pop(); // Close the dialog
+        });
+      }
+    } else {
+      // Show a warning if not all fields are selected
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please select all required fields"),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   @override
@@ -125,11 +167,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                       if (_formKey.currentState?.validate() ?? false) {
                         String amount = _amountController.text;
                         if (amount.isNotEmpty) {
-                          // Handle save action
-                          print('Payment Type: $selectedPaymentType');
-                          print('Amount: $amount');
-                          // Optionally, hide the form after saving
-                          _togglePaymentDialog();
+                          _AddPaymentData();
                         }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(

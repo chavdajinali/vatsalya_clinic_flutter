@@ -10,6 +10,7 @@ import 'package:vatsalya_clinic/utils/ResponsiveBuilder.dart';
 
 import '../authentication_bloc/authentication_bloc.dart';
 import '../authentication_bloc/authentication_event.dart';
+import '../history_patients_list/history_patients_bloc.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -28,7 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
     BlocProvider(
         create: (BuildContext context) => CreatePatientsBloc(),
         child: const CreatePatientsScreen()),
-    const HistoryPatientsListScreen()
+    BlocProvider(
+        create: (BuildContext context) => HistoryPatientsBloc(),
+        child: const HistoryPatientsListScreen()),
   ];
 
   void _onItemTapped(int index) {

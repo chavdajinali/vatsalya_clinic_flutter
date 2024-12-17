@@ -19,34 +19,38 @@ class TodaysAppointmentPage extends StatefulWidget {
 class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
   List<AppointmentModel> appoinmentList = [];
   List<AppointmentModel> fetchedList = [];
+  List<String> patients_id = [];
 
   Future<void> _loadAppoinmentDetails() async {
     fetchedList = await getAppoinmentFromFirestore();
 
-    // Temporary list to store the updated appointment data
     List<AppointmentModel> updatedList = [];
 
     for (var appointment in fetchedList) {
-      // Fetch the patient details from patients_tbl using patientName as the document ID
+      // Fetch patient details from 'patients_tbl'
       DocumentSnapshot patientSnapshot = await FirebaseFirestore.instance
           .collection('patients_tbl')
-          .doc(appointment.patientName) // Assuming this is the document ID in patients_tbl
+          .doc(appointment.patientName)
           .get();
 
-      // Check if the document exists and get the name field from patients_tbl
       if (patientSnapshot.exists) {
-        var patientName = patientSnapshot['name']; // Field name in patients_tbl
-        appointment = appointment.copyWith(patientName: patientName); // Update the appointment with the patient's actual name
+        var patientName = patientSnapshot['name'];
+
+        // Fetch payment status for this appointment (assuming it's in Firestore)
+        var paymentStatus = appointment.payment; // Get from fetched data
+        appointment = appointment.copyWith(
+          patientName: patientName,
+          payment: paymentStatus, // Update payment field
+        );
       }
 
-      // Add the updated appointment to the list
       updatedList.add(appointment);
     }
 
     setState(() {
-      appoinmentList = [];
       appoinmentList = updatedList;
     });
+
     if (kDebugMode) {
       print(appoinmentList);
     }
@@ -121,6 +125,12 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                       itemBuilder: (context, index) {
                         var appointment = appoinmentList[index];
                         var fetchedData = fetchedList[index];
+
+                        // Determine the button color based on the payment status
+                        bool isPaymentDone = appointment.payment == "Yes"; // Check payment status
+                        Color paymentButtonColor = isPaymentDone ? Colors.green : Colors.red;
+                        String paymentButtonText = isPaymentDone ? "Paid" : "Payment";
+
                         return Card(
                           color: Colors.grey[100],
                           child: Padding(
@@ -189,26 +199,29 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                                     TextButton(
                                       onPressed:() {
                                         // Call the PaymentDialog function to show the dialog
+                                        final patientId = fetchedList[index].patientName;
+                                        final appointmentDate = fetchedList[index].appointmentDate;
                                         showDialog(
                                           context: context,
                                           builder: (BuildContext context) {
-                                            return PaymentDialog(); // Display the dialog
+                                            print(patientId);
+                                            return PaymentDialog(patientsId: patientId,appoinmentDate: appointmentDate); // Display the dialog
                                           },
                                         );
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(
-                                            color: Colors.grey.shade200,
+                                            color: paymentButtonColor,
                                             borderRadius:
                                             const BorderRadius.all(
                                                 Radius.circular(10.0))),
-                                        child: const Padding(
-                                          padding: EdgeInsets.symmetric(
+                                        child:  Padding(
+                                          padding: const EdgeInsets.symmetric(
                                               horizontal: 16.0,
                                               vertical: 10.0),
-                                          child: Text('Payment',
-                                              style: TextStyle(
-                                                  color: Colors.blue)),
+                                          child: Text(paymentButtonText,
+                                              style: const TextStyle(
+                                                  color: Colors.white)),
                                         ),
                                       ),
                                     ),

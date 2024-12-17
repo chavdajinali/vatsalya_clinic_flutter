@@ -18,6 +18,7 @@ class Addbookappoinmentfirestoreservice {
       appointmentTime: appoinment_time,
       appointmentReferenceBy: reference_by,
       appointmentChiefComplain : chief_complain,
+      payment : "No",
     );
 
     try {
