@@ -1,6 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vatsalya_clinic/models/patients_model.dart';
+import 'package:vatsalya_clinic/screens/history_patients_list/history_patients_bloc.dart';
+import 'package:vatsalya_clinic/screens/history_patients_list/history_patients_event.dart';
+import 'package:vatsalya_clinic/screens/history_patients_list/history_patients_state.dart';
 import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
 
 class HistoryPatientsListScreen extends StatefulWidget {
@@ -14,18 +18,27 @@ class HistoryPatientsListScreen extends StatefulWidget {
 class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder(
-          future: getNamesOfPatientsFromFirestore(),
-          builder: (ctx, snapshot) {
-            return snapshot.connectionState == ConnectionState.waiting
-                ? const Center(child: CircularProgressIndicator())
-                : snapshot.hasError
-                    ? Center(child: Text(snapshot.error.toString()))
-                    : ListView.builder(
-                        itemCount: snapshot.data?.length ?? 0,
+    return BlocProvider(
+      create: (context) {
+        var block = HistoryPatientsBloc();
+        block.add(GetPatientList());
+        return block;
+      },
+      child: BlocConsumer<HistoryPatientsBloc, HistoryPatientsState>(
+          listener: (context, state) {
+        // do stuff here based on BlocA's state
+      }, builder: (context, state) {
+        return state is HistoryPatientsFailure
+            ? Center(child: Text(state.error))
+            : state is HistoryPatientsSuccess
+                ? state.patientList.isEmpty
+                    ? const Center(child: Text("No data found."))
+                    :
+                    // return widget here based on BlocA's state
+                    ListView.builder(
+                        itemCount: state.patientList.length,
                         itemBuilder: (context, index) {
-                          var patient = snapshot.data![index];
+                          var patient = state.patientList[index];
                           return Card(
                             margin: const EdgeInsets.only(
                                 top: 16, left: 16, right: 16),
@@ -34,7 +47,11 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 InkWell(
-                                  onTap: () {},
+                                  onTap: () {
+                                    BlocProvider.of<HistoryPatientsBloc>(
+                                            context)
+                                        .add(ExpandCollapsePatientItem(index));
+                                  },
                                   child: Padding(
                                     padding: const EdgeInsets.all(16.0),
                                     child: Row(
@@ -69,8 +86,9 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                               ],
                             ),
                           );
-                        });
-          }),
+                        })
+                : const Center(child: CircularProgressIndicator());
+      }),
     );
   }
 }

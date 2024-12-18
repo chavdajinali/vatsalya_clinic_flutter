@@ -29,7 +29,7 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime.now(),  // Restrict to current date or later
+      firstDate: DateTime.now(), // Restrict to current date or later
       lastDate: DateTime(2100),
     );
     if (picked != null && picked != selectedDate) {
@@ -48,10 +48,13 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
     if (picked != null) {
       // Compare selected time with current time
       if (picked.hour < currentTime.hour ||
-          (picked.hour == currentTime.hour && picked.minute < currentTime.minute)) {
+          (picked.hour == currentTime.hour &&
+              picked.minute < currentTime.minute)) {
         // If the selected time is before the current time, show an error message
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('You cannot select a time before the current time')),
+          SnackBar(
+              content:
+                  Text('You cannot select a time before the current time')),
         );
       } else {
         setState(() {
@@ -107,7 +110,7 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
         reference_by: selectedReference.toString(),
         appoinment_time: selectedTime!.format(context),
         appoinment_date:
-        '${selectedDate!.year}-${selectedDate!.month}-${selectedDate!.day}',
+            '${selectedDate!.year}-${selectedDate!.month}-${selectedDate!.day}',
         chief_complain: _chiefComplaintController.text,
       );
 
@@ -128,8 +131,10 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
           selectedDate = null;
           selectedTime = null;
           selectedReference = null;
-          dropDownKey.currentState?.changeSelectedItem(null); // Clear DropdownSearch
+          dropDownKey.currentState
+              ?.changeSelectedItem(null); // Clear DropdownSearch
         });
+        Navigator.pop(context);
       }
     } else {
       // Show a warning if not all fields are selected
@@ -141,7 +146,6 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
       );
     }
   }
-
 
   @override
   void initState() {

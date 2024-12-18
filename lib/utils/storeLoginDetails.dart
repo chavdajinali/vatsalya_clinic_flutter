@@ -23,14 +23,16 @@ Future<List<String>> getNamesFromFirestore() async {
   List<String> names = [];
 
   // Get a reference to the Firestore collection
-  final CollectionReference referenceTbl = FirebaseFirestore.instance.collection('refernce_tbl');
+  final CollectionReference referenceTbl =
+      FirebaseFirestore.instance.collection('refernce_tbl');
 
   // Query the collection for all documents
   QuerySnapshot querySnapshot = await referenceTbl.get();
 
   // Iterate through the documents and extract the 'name' field
   for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-    names.add(doc.get('name') as String); // Assuming 'name' is the field for names
+    names.add(
+        doc.get('name') as String); // Assuming 'name' is the field for names
   }
 
   return names;
@@ -40,43 +42,43 @@ Future<List<AppointmentModel>> getAppoinmentFromFirestore() async {
   List<AppointmentModel> appointmentList = [];
 
   // Get a reference to the Firestore collection
-  final CollectionReference appointmentTbl = FirebaseFirestore.instance.collection('appointment_tbl');
+  final CollectionReference appointmentTbl =
+      FirebaseFirestore.instance.collection('appointment_tbl');
 
   // Query the collection for all documents
   QuerySnapshot querySnapshot = await appointmentTbl.get();
-
+  final currentDate = DateTime.now();
+  final formattedCurrentDate =
+      '${currentDate.year}-${currentDate.month}-${currentDate.day}';
   // Iterate through the documents and extract the 'name' field
   for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-    AppointmentModel data =  AppointmentModel.fromJson(doc.data() as Map<String,dynamic>);
-    final currentDate = DateTime.now();
-    final formattedCurrentDate = '${currentDate.year}-${currentDate.month}-${currentDate.day}';
+    AppointmentModel data =
+        AppointmentModel.fromJson(doc.data() as Map<String, dynamic>);
+
     if (data.appointmentDate == formattedCurrentDate) {
-      AppointmentModel appoinmentData = data;
-      appointmentList.add(appoinmentData);
+      appointmentList.add(data);
     }
   }
 
   return appointmentList;
 }
 
-
 Future<List<PatientsModel>> getNamesOfPatientsFromFirestore() async {
   List<PatientsModel> PatientsModelList = [];
 
   // Get a reference to the Firestore collection
-  final CollectionReference patientsTbl = FirebaseFirestore.instance.collection('patients_tbl');
+  final CollectionReference patientsTbl =
+      FirebaseFirestore.instance.collection('patients_tbl');
 
   // Query the collection for all documents
   QuerySnapshot querySnapshot = await patientsTbl.get();
 
   // Iterate through the documents and extract the 'name' field
   for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-    var patient = PatientsModel.fromJson(doc.data() as Map<String,dynamic>);
+    var patient = PatientsModel.fromJson(doc.data() as Map<String, dynamic>);
     patient.id = doc.id;
     PatientsModelList.add(patient); // Assuming 'name' is the field for names
   }
 
   return PatientsModelList;
 }
-
-

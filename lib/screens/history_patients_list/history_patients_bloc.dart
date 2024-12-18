@@ -2,111 +2,71 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vatsalya_clinic/screens/create_patients/create_patients_state.dart';
 
+import '../../models/patients_model.dart';
 import 'history_patients_event.dart';
 import 'history_patients_state.dart';
 
 class HistoryPatientsBloc
     extends Bloc<HistoryPatientsEvent, HistoryPatientsState> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   HistoryPatientsBloc() : super(HistoryPatientsInitial()) {
     // Register the event handler for SignInRequested
-    on<HistoryPatientsRequested>(_onHistoryPatientsRequested);
     on<GetPatientList>(_getPatientList);
+    on<ExpandCollapsePatientItem>(_manageExpandCollapse);
   }
 
   // This method handles the SignInRequested event
-  Future _getPatientList(GetPatientList event,
-      Emitter<HistoryPatientsState> emit) async {
+  Future _getPatientList(
+      GetPatientList event, Emitter<HistoryPatientsState> emit) async {
     emit(HistoryPatientsLoading());
 
-
-  }
-  // This method handles the SignInRequested event
-  Future<String?> _onHistoryPatientsRequested(HistoryPatientsRequested event,
-      Emitter<HistoryPatientsState> emit) async {
-    print("HistoryPatientsRequested triggered");
-
-    // Validate patient details
-    String? validationError = _validatePatientDetails(
-        event.name, event.age, event.gender, event.mobile, event.address);
-    if (validationError != null) {
-      emit(HistoryPatientsValidationError(error: validationError));
-      return 'validation error.';
-    }
-
-    emit(HistoryPatientsLoading());
+    List<PatientsModel> patientsModelList = [];
 
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('patients_tbl')
-          .where('mobile', isEqualTo: event.mobile)
-          .limit(1) // Limit to 1 result for efficiency
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        emit(HistoryPatientsFailure(
-            error: 'Patients is Already registered with this mobile number.'));
-        return 'Patients is Already registered.';
-      } else {
-        try {
-          /* var result = await AddPatientsFirestoreService().addPatient(
-              name: event.name,
-              age: event.age,
-              gender: event.gender,
-              mobile: event.mobile,
-              createdDate: event.createdDate,
-              address: event.address);
-
-          if (result != 'success') {
-            emit(HistoryPatientsFailure(error: result ?? ""));
-            return result;
-          } else {
-            emit(HistoryPatientsSuccess());
-            return result;
-          }*/
-        } catch (e) {
-          emit(HistoryPatientsFailure(error: 'Error: ${e.toString()}'));
-          return 'Error: ${e.toString()}';
-        }
+      // Query the collection for all documents
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('patients_tbl').get();
+      // Iterate through the documents and extract the 'name' field
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        var patient =
+            PatientsModel.fromJson(doc.data() as Map<String, dynamic>);
+        patient.id = doc.id;
+        patientsModelList
+            .add(patient); // Assuming 'name' is the field for names
       }
+      emit(HistoryPatientsSuccess(patientList: patientsModelList));
     } catch (e) {
-      return 'Error: ${e.toString()}';
+      emit(HistoryPatientsFailure(error: e.toString()));
     }
   }
 
-  String? _validatePatientDetails(
-      String name, String age, String gender, String mobile, String address) {
-    // Name validation: Must not be empty and only contain letters and spaces
-    final nameRegex = RegExp(r"^[a-zA-Z\s]+$");
-    if (name.isEmpty || !nameRegex.hasMatch(name)) {
-      return 'Name must contain only letters and spaces.';
-    }
+  Future<void> _manageExpandCollapse(
+      ExpandCollapsePatientItem event, Emitter<HistoryPatientsState> emit) async {
+    if (state is HistoryPatientsSuccess) {
+      // Clone the patient list to ensure immutability
+      var patientList = List<PatientsModel>.from(
+          (state as HistoryPatientsSuccess).patientList);
 
-    // Age validation: Must be a positive integer and at least 1
-    final ageRegex = RegExp(r"^[1-9][0-9]*$");
-    if (!ageRegex.hasMatch(age) || int.parse(age) < 1) {
-      return 'Age must be a positive integer.';
-    }
+      for (int i = 0; i < patientList.length; i++) {
+        patientList[i] = patientList[i].copyWith(
+          isExpanded: i == event.index, // Update only the selected item
+        );
+      }
 
-    // Gender validation: Must be one of the accepted values ("Male", "Female", "Other")
-    final validGenders = ["Male", "Female", "Other"];
-    if (!validGenders.contains(gender)) {
-      return 'Gender must be "Male", "Female", or "Other".';
+      // Emit a new instance of the state with the updated list
+      emit(HistoryPatientsSuccess(patientList: patientList));
     }
-
-    // Mobile number validation: Must be 10 digits (adjust as per country requirements)
-    final mobileRegex = RegExp(r"^\d{10}$");
-    if (!mobileRegex.hasMatch(mobile)) {
-      return 'Mobile number must contain exactly 10 digits.';
-    }
-
-    // Address validation: Cannot be empty and should contain at least 5 characters
-    if (address.isEmpty || address.length < 5) {
-      return 'Address must contain at least 5 characters.';
-    }
-
-    // If all validations pass
-    return null;
   }
+
+// Future _manageExpandCollapse(ExpandCollapsePatientItem event,
+  //     Emitter<HistoryPatientsState> emit) async {
+  //   // emit(HistoryPatientsLoading());
+  //
+  //   if (state is HistoryPatientsSuccess) {
+  //     var patientList = (state as HistoryPatientsSuccess).patientList;
+  //     for (int i = 0; i < patientList.length; i++) {
+  //       patientList[i].isExpanded = i == event.index;
+  //     }
+  //     emit(HistoryPatientsSuccess(patientList: patientList));
+  //   }
+  // }
 }

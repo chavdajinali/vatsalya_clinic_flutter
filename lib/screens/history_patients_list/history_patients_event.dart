@@ -7,19 +7,10 @@ abstract class HistoryPatientsEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetPatientList extends HistoryPatientsEvent {
-}
+class GetPatientList extends HistoryPatientsEvent {}
 
-class HistoryPatientsRequested extends HistoryPatientsEvent {
-  final String name;
-  final String age;
-  final String gender;
-  final String mobile;
-  final String address;
-  final String createdDate;
+class ExpandCollapsePatientItem extends HistoryPatientsEvent {
+  late final int index;
 
-  HistoryPatientsRequested({required this.name, required this.age, required this.gender, required this.mobile, required this.address,required this.createdDate});
-
-  @override
-  List<Object> get props => [name, age, gender, mobile, address];
+  ExpandCollapsePatientItem(this.index);
 }
