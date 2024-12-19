@@ -10,7 +10,13 @@ abstract class HistoryPatientsEvent extends Equatable {
 class GetPatientList extends HistoryPatientsEvent {}
 
 class ExpandCollapsePatientItem extends HistoryPatientsEvent {
-  late final int index;
+  final int index;
 
   ExpandCollapsePatientItem(this.index);
+}
+
+class GetPatientHistory extends HistoryPatientsEvent {
+  final String patientId;
+
+  GetPatientHistory(this.patientId);
 }

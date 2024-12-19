@@ -1,6 +1,7 @@
 // sign_in_state.dart
 
 import 'package:equatable/equatable.dart';
+import 'package:vatsalya_clinic/models/appointment_model.dart';
 
 import '../../models/patients_model.dart';
 
@@ -15,8 +16,31 @@ class HistoryPatientsLoading extends HistoryPatientsState {}
 
 class HistoryPatientsSuccess extends HistoryPatientsState {
   final List<PatientsModel> patientList;
+  final List<AppointmentModel> patientHistory;
+  final bool isPatientHistoryLoading;
+  final String errorMessage;
 
-  HistoryPatientsSuccess({required this.patientList});
+  HistoryPatientsSuccess(
+      {required this.patientList,
+      required this.patientHistory,
+      required this.errorMessage,
+      required this.isPatientHistoryLoading});
+
+  HistoryPatientsSuccess copyWith(
+          {List<PatientsModel>? patientList,
+          List<AppointmentModel>? patientHistory,
+          String? errorMessage,
+          bool? isPatientHistoryLoading}) =>
+      HistoryPatientsSuccess(
+          patientList: patientList ?? this.patientList,
+          errorMessage: errorMessage ?? this.errorMessage,
+          isPatientHistoryLoading:
+              isPatientHistoryLoading ?? this.isPatientHistoryLoading,
+          patientHistory: patientHistory ?? this.patientHistory);
+
+  @override
+  List<Object?> get props =>
+      [patientList, patientHistory, isPatientHistoryLoading, errorMessage];
 }
 
 class HistoryPatientsFailure extends HistoryPatientsState {

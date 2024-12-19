@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/models/patients_model.dart';
+import 'package:vatsalya_clinic/screens/history_patients_list/appointment_info/appointment_info.dart';
 import 'package:vatsalya_clinic/screens/history_patients_list/history_patients_bloc.dart';
 import 'package:vatsalya_clinic/screens/history_patients_list/history_patients_event.dart';
 import 'package:vatsalya_clinic/screens/history_patients_list/history_patients_state.dart';
@@ -81,7 +83,14 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                   ),
                                 ),
                                 patient.isExpanded
-                                    ? const Text("History....")
+                                    ? state.isPatientHistoryLoading
+                                        ? const CircularProgressIndicator()
+                                        : state.patientHistory.isEmpty
+                                            ? Text(state.errorMessage)
+                                            : Wrap(
+                                                children: getDates(
+                                                    state.patientHistory),
+                                              )
                                     : Container()
                               ],
                             ),
@@ -91,4 +100,27 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
       }),
     );
   }
+
+  List<Widget> getDates(List<AppointmentModel> appointments) {
+    List<Widget> dates = [];
+    for (var appointment in appointments) {
+      dates.add(Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: OutlinedButton(
+            onPressed: () {
+              showAppointmentInfo(context, appointment);
+            }, child: Text(appointment.appointmentDate ?? "N/A")),
+      ));
+    }
+    return dates;
+  }
+
+  void showAppointmentInfo(BuildContext context, AppointmentModel appointment) {
+    showDialog(
+      context: context,
+      builder: (context) => AppointmentInfo(appointmentData: appointment),
+    );
+  }
 }
+
+

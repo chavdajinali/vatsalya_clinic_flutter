@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/screens/create_patients/create_patients_state.dart';
 
 import '../../models/patients_model.dart';
@@ -12,6 +13,7 @@ class HistoryPatientsBloc
     // Register the event handler for SignInRequested
     on<GetPatientList>(_getPatientList);
     on<ExpandCollapsePatientItem>(_manageExpandCollapse);
+    on<GetPatientHistory>(_getPatientHistory);
   }
 
   // This method handles the SignInRequested event
@@ -33,40 +35,69 @@ class HistoryPatientsBloc
         patientsModelList
             .add(patient); // Assuming 'name' is the field for names
       }
-      emit(HistoryPatientsSuccess(patientList: patientsModelList));
+      emit(HistoryPatientsSuccess(
+          patientList: patientsModelList,
+          patientHistory: [],
+          isPatientHistoryLoading: false,
+          errorMessage: ""));
     } catch (e) {
       emit(HistoryPatientsFailure(error: e.toString()));
     }
   }
 
-  Future<void> _manageExpandCollapse(
-      ExpandCollapsePatientItem event, Emitter<HistoryPatientsState> emit) async {
+  Future<void> _manageExpandCollapse(ExpandCollapsePatientItem event,
+      Emitter<HistoryPatientsState> emit) async {
     if (state is HistoryPatientsSuccess) {
       // Clone the patient list to ensure immutability
       var patientList = List<PatientsModel>.from(
           (state as HistoryPatientsSuccess).patientList);
 
       for (int i = 0; i < patientList.length; i++) {
-        patientList[i] = patientList[i].copyWith(
-          isExpanded: i == event.index, // Update only the selected item
-        );
+        if (i == event.index) {
+          patientList[i] = patientList[i].copyWith(
+            isExpanded:
+                !patientList[i].isExpanded, // Update only the selected item
+          );
+          if (patientList[i].isExpanded) {
+            add(GetPatientHistory(patientList[i].id));
+          }
+        } else {
+          patientList[i] = patientList[i].copyWith(
+            isExpanded: false, // Update only the selected item
+          );
+        }
       }
 
       // Emit a new instance of the state with the updated list
-      emit(HistoryPatientsSuccess(patientList: patientList));
+      emit(
+          (state as HistoryPatientsSuccess).copyWith(patientList: patientList));
     }
   }
 
-// Future _manageExpandCollapse(ExpandCollapsePatientItem event,
-  //     Emitter<HistoryPatientsState> emit) async {
-  //   // emit(HistoryPatientsLoading());
-  //
-  //   if (state is HistoryPatientsSuccess) {
-  //     var patientList = (state as HistoryPatientsSuccess).patientList;
-  //     for (int i = 0; i < patientList.length; i++) {
-  //       patientList[i].isExpanded = i == event.index;
-  //     }
-  //     emit(HistoryPatientsSuccess(patientList: patientList));
-  //   }
-  // }
+  Future<void> _getPatientHistory(
+      GetPatientHistory event, Emitter<HistoryPatientsState> emit) async {
+    emit((state as HistoryPatientsSuccess)
+        .copyWith(isPatientHistoryLoading: true));
+
+    // Fetch the user from Firestore
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('appointment_tbl')
+        .where('patients_name', isEqualTo: event.patientId)
+        .get();
+
+    if (snapshot.docs.isEmpty) {
+      emit((state as HistoryPatientsSuccess).copyWith(
+          isPatientHistoryLoading: false, errorMessage: "No history found."));
+    } else {
+      List<AppointmentModel> appointments = [];
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        appointments.add(AppointmentModel.fromJson(doc.data()
+            as Map<String, dynamic>)); // Assuming 'name' is the field for names
+      }
+      emit((state as HistoryPatientsSuccess).copyWith(
+          isPatientHistoryLoading: false,
+          errorMessage: "",
+          patientHistory: appointments));
+    }
+  }
 }

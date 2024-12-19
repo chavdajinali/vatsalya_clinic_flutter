@@ -173,22 +173,7 @@ class _ReportScreenState extends State<ReportScreen> {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: Center(
-            child: Text(
-              'Patient Details',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ),
         const SizedBox(height: 16),
-
-        // Text Fields (Name, Age, Mobile, Address)
         buildTextField(controller: nameController, labelText: 'Name', readOnly: true, obscureText: false),
         const SizedBox(height: 16),
         buildTextField(controller: ageController, labelText: 'Age', readOnly: true, obscureText: false),
@@ -198,11 +183,9 @@ class _ReportScreenState extends State<ReportScreen> {
         buildTextField(controller: addressController, labelText: 'Address', readOnly: true, obscureText: false),
         const SizedBox(height: 16),
 
-        // Row with Select Report and Gallery/Camera Buttons
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Select Report TextField
             Expanded(
               child: buildTextField(
                 controller: TextEditingController(text: selectedReport),
@@ -234,57 +217,41 @@ class _ReportScreenState extends State<ReportScreen> {
             ),
             const SizedBox(width: 16),
 
-            // Gallery and Camera Buttons
-            Row(
-              children: [
-                // For web only show Gallery
-                if (kIsWeb)
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.photo_library),
-                    label: const Text('Gallery'),
-                    onPressed: () => _pickImage(ImageSource.gallery),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(120, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      elevation: 4,
-                    ),
+            if (imageFile == null)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.photo_library),
+                label: const Text('Gallery'),
+                onPressed: () => _pickImage(ImageSource.gallery),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(120, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  elevation: 4,
+                ),
+              )
+            else
+              GestureDetector(
+                onTap: () => _pickImage(ImageSource.gallery), // Allow user to replace the image
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: kIsWeb
+                      ? Image.network(
+                    imageFile!.path, // Web: Network path
+                    width: 120,
+                    height: 50,
+                    fit: BoxFit.cover,
                   )
-                // For mobile, show both Gallery and Camera
-                else ...[
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.photo_library),
-                    label: const Text('Gallery'),
-                    onPressed: () => _pickImage(ImageSource.gallery),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(120, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      elevation: 4,
-                    ),
+                      : Image.file(
+                    File(imageFile!.path), // Mobile: Local file
+                    width: 120,
+                    height: 50,
+                    fit: BoxFit.cover,
                   ),
-                  const SizedBox(width: 8),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text('Camera'),
-                    onPressed: () => _pickImage(ImageSource.camera),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(120, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      elevation: 4,
-                    ),
-                  ),
-                ]
-              ],
-            ),
-            const SizedBox(width: 10),
+                ),
+              ),
+            const SizedBox(width: 8),
             ElevatedButton.icon(
               icon: const Icon(Icons.save),
               label: const Text('SAVE'),
@@ -301,16 +268,11 @@ class _ReportScreenState extends State<ReportScreen> {
           ],
         ),
         const SizedBox(height: 20),
-
-        // Display List of Saved Reports
-        const SizedBox(height: 20),
-
         if (sortedReports().isNotEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8.0),
             child: Text("Selected reports data:"),
           ),
-
         Expanded(
           child: ListView.builder(
             itemCount: sortedReports().length,
@@ -322,13 +284,13 @@ class _ReportScreenState extends State<ReportScreen> {
                   trailing: IconButton(onPressed: () => removeAddedReportFromList(index), icon: const Icon(Icons.close)),
                   leading: kIsWeb
                       ? Image.network(
-                    report['reportimage'], // You may need to change this to network URLs for web
+                    report['reportimage'], // Web: Network path
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
                   )
                       : Image.file(
-                    File(report['reportimage']), // For mobile
+                    File(report['reportimage']), // Mobile: Local file
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
@@ -340,19 +302,17 @@ class _ReportScreenState extends State<ReportScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        // Submit Button
-
         Center(
           child: GradientButton(
-              padding: const EdgeInsets.all(12.0),
-              text: 'Submit Report',
-              onPressed: () {
-                submitReportData();
-              }),
+            padding: const EdgeInsets.all(12.0),
+            text: 'Submit Report',
+            onPressed: submitReportData,
+          ),
         ),
       ],
     );
   }
+
 
   @override
   void initState() {
@@ -366,7 +326,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text('Add More Details')),
+        title: const Center(child: Text('Patients Details')),
         elevation: 2,
       ),
       body: Padding(
