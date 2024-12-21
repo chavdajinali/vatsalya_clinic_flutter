@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: "Vatslya clinic",
       home: (loginDetails.email.isNotEmpty)
           ? const HomeScreen()
           : BlocProvider(

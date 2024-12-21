@@ -1,6 +1,6 @@
 {
-    "name": "vatsalya_clinic",
-    "short_name": "vatsalya_clinic",
+    "name": "Vatsalya clinic",
+    "short_name": "Vatsalya clinic",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
