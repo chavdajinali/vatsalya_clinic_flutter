@@ -40,7 +40,7 @@ class CreatePatientsBloc
         return 'Patients is Already registered.';
       }else{
         try {
-          var result = await AddPatientsFirestoreService().addPatient(
+          var result = await AddPatientsFirestoreService().addPatient(id: "",
               name: event.name,
               age: event.age,
               gender: event.gender,

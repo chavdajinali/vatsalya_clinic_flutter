@@ -12,6 +12,14 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
   SignInBloc() : super(SignInInitial()) {
     // Register the event handler for SignInRequested
     on<SignInRequested>(_onSignInRequested);
+    on<SignOutRequested>(_onSignOutRequested);
+  }
+
+  // This method handles the SignInRequested event
+  Future<void> _onSignOutRequested(
+      SignOutRequested event, Emitter<SignInState> emit) async {
+    storeLoginDetails(UserModel.initial());
+    emit(SignInInitial());
   }
 
   // This method handles the SignInRequested event

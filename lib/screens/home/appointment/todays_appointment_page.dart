@@ -76,7 +76,7 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
       children: [
         Expanded(
           child: Card(
-            margin: const EdgeInsets.all(16),
+            margin: const EdgeInsets.all(16),surfaceTintColor: Colors.white,color: Colors.white,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -144,7 +144,7 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                             : "Payment";
 
                         return Card(
-                          color: Colors.grey[100],
+                          color: Colors.white,
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Row(
@@ -214,7 +214,7 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                                               horizontal: 16.0,
                                               vertical: 10.0),
                                           child: Text(
-                                              'Add Details',
+                                              'Add Reports',
                                               style: TextStyle(
                                                   color: Colors
                                                       .blue)),

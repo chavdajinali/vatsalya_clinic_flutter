@@ -23,15 +23,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return iOS;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return iOS;
       case TargetPlatform.windows:
         return windows;
       case TargetPlatform.linux:
@@ -47,30 +41,40 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAbSHt6Qn7xECZbMsXjCwA-KP9VUs2LfwA',
-    appId: '1:420736845468:web:43d5c6abeb7fa5d6420f59',
-    messagingSenderId: '420736845468',
-    projectId: 'vatsalyaclinic-7142e',
-    authDomain: 'vatsalyaclinic-7142e.firebaseapp.com',
-    storageBucket: 'vatsalyaclinic-7142e.appspot.com',
-    measurementId: 'G-NK26CVCY74',
+    apiKey: "AIzaSyCbuh8WLUxN-SQfqhEG_YHIg6QlYaNFNv0",
+    authDomain: "vatsalyaclinicproject.firebaseapp.com",
+    projectId: "vatsalyaclinicproject",
+    storageBucket: "vatsalyaclinicproject.firebasestorage.app",
+    messagingSenderId: "846259022190",
+    appId: "1:846259022190:web:8c14c31a9bf7ef3b17b97f",
+    measurementId: "G-VLJ54FJDEV"
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyD59IIHOlWWqaEjO26Qj_THMA7ppUKi6r4',
-    appId: '1:420736845468:android:b395abe7a79df553420f59',
-    messagingSenderId: '420736845468',
-    projectId: 'vatsalyaclinic-7142e',
-    storageBucket: 'vatsalyaclinic-7142e.appspot.com',
+    apiKey: "AIzaSyCbuh8WLUxN-SQfqhEG_YHIg6QlYaNFNv0",
+    appId: '1:846259022190:android:18ddb8654bd3fbaa17b97f',
+    projectId: "vatsalyaclinicproject",
+    storageBucket: "vatsalyaclinicproject.firebasestorage.app",
+    messagingSenderId: "846259022190",
+    measurementId: "G-VLJ54FJDEV"
+  );
+
+  static const FirebaseOptions iOS = FirebaseOptions(
+      apiKey: "AIzaSyCbuh8WLUxN-SQfqhEG_YHIg6QlYaNFNv0",
+      appId: '1:846259022190:ios:be59bf7eda7a884117b97f',
+      projectId: "vatsalyaclinicproject",
+      storageBucket: "vatsalyaclinicproject.firebasestorage.app",
+      messagingSenderId: "846259022190",
+      measurementId: "G-VLJ54FJDEV"
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAbSHt6Qn7xECZbMsXjCwA-KP9VUs2LfwA',
-    appId: '1:420736845468:web:06fc636ad6ce5030420f59',
-    messagingSenderId: '420736845468',
-    projectId: 'vatsalyaclinic-7142e',
-    authDomain: 'vatsalyaclinic-7142e.firebaseapp.com',
-    storageBucket: 'vatsalyaclinic-7142e.appspot.com',
-    measurementId: 'G-G66QQZ7E7X',
+    apiKey: "AIzaSyCbuh8WLUxN-SQfqhEG_YHIg6QlYaNFNv0",
+    authDomain: "vatsalyaclinicproject.firebaseapp.com",
+    projectId: "vatsalyaclinicproject",
+    storageBucket: "vatsalyaclinicproject.firebasestorage.app",
+    messagingSenderId: "846259022190",
+    appId: "1:846259022190:web:8c14c31a9bf7ef3b17b97f",
+    measurementId: "G-VLJ54FJDEV"
   );
 }

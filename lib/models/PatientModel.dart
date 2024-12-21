@@ -1,4 +1,5 @@
 class PatientModel {
+  late String id;
   final String name;
   final String age;
   final String gender;
@@ -6,6 +7,7 @@ class PatientModel {
   bool isExpanded; // Add this property
 
   PatientModel({
+    required this.id,
     required this.name,
     required this.age,
     required this.gender,

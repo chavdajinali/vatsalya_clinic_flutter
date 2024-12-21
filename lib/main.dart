@@ -26,13 +26,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: (loginDetails.email.isNotEmpty)
-          ? const HomeScreen()
-          : BlocProvider(
-              create: (context) => SignInBloc(),
-              child: const SignInScreen(),
-            ),
+    return BlocProvider(
+      create: (context) => SignInBloc(),
+      lazy: false,
+      child: MaterialApp(
+        home: (loginDetails.email.isNotEmpty)
+            ? const HomeScreen()
+            : const SignInScreen(),
+      ),
     );
   }
 }

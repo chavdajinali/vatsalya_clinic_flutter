@@ -10,6 +10,9 @@ class UserModel {
       required this.role,
       required this.password});
 
+  factory UserModel.initial() =>
+      UserModel(name: "", email: "", role: "", password: "");
+
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
       name: json['name'] ?? "",
       email: json['email'] ?? "",

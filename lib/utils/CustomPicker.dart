@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 class CustomPicker extends StatelessWidget {
   final List<String> items; // List of items to display
   final String title; // Title for the picker
-  final ValueChanged<String> onSelected; // Callback for when an item is selected
+  final ValueChanged<String>
+      onSelected; // Callback for when an item is selected
 
-  const CustomPicker({super.key,
+  const CustomPicker({
+    super.key,
     required this.items,
     required this.onSelected,
     this.title = 'Select an Option',
@@ -43,18 +45,21 @@ class CustomPicker extends StatelessWidget {
           ),
         ),
         const Divider(),
-        ListView.builder(
-          shrinkWrap: true, // Ensure the list fits within the modal height
-          itemCount: items.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              title: Text(items[index]),
-              onTap: () {
-                onSelected(items[index]); // Pass the selected value to the callback
-                Navigator.pop(context); // Close the modal
-              },
-            );
-          },
+        Expanded(
+          child: ListView.builder(
+            shrinkWrap: true, // Ensure the list fits within the modal height
+            itemCount: items.length,
+            itemBuilder: (BuildContext context, int index) {
+              return ListTile(
+                title: Text(items[index]),
+                onTap: () {
+                  onSelected(
+                      items[index]); // Pass the selected value to the callback
+                  Navigator.pop(context); // Close the modal
+                },
+              );
+            },
+          ),
         ),
       ],
     );

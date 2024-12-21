@@ -1,7 +1,7 @@
 class AppointmentModel {
   late String id;
   late String? patientName;
-  late String? appointmentDate;
+  late String appointmentDate;
   late String? appointmentTime;
   late String? appointmentReferenceBy;
   late String? appointmentChiefComplain;

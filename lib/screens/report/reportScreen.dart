@@ -18,7 +18,7 @@ class ReportScreen extends StatefulWidget {
 }
 
 class _ReportScreenState extends State<ReportScreen> {
-  final List<String> reportNames = ['Report 1', 'Report 2', 'Report 3'];
+  final List<String> reportNames = ['PTA', 'Impedance', 'ETF Test','OAE Test','BERA Test','ASSR Test','Speech Assessment','Special Test','Bill'];
   String? selectedReport;
   final ImagePicker _picker = ImagePicker();
   XFile? imageFile;
@@ -216,7 +216,6 @@ class _ReportScreenState extends State<ReportScreen> {
               ),
             ),
             const SizedBox(width: 16),
-
             if (imageFile == null)
               ElevatedButton.icon(
                 icon: const Icon(Icons.photo_library),
@@ -232,24 +231,46 @@ class _ReportScreenState extends State<ReportScreen> {
                 ),
               )
             else
-              GestureDetector(
-                onTap: () => _pickImage(ImageSource.gallery), // Allow user to replace the image
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: kIsWeb
-                      ? Image.network(
-                    imageFile!.path, // Web: Network path
-                    width: 120,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  )
-                      : Image.file(
-                    File(imageFile!.path), // Mobile: Local file
-                    width: 120,
-                    height: 50,
-                    fit: BoxFit.cover,
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => _pickImage(ImageSource.gallery), // Allow user to replace the image
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: kIsWeb
+                          ? Image.network(
+                        imageFile!.path, // Web: Network path
+                        width: 120,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      )
+                          : Image.file(
+                        File(imageFile!.path), // Mobile: Local file
+                        width: 120,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.cancel),
+                    label: const Text(''),
+                    onPressed: () {
+                      setState(() {
+                        imageFile = null; // Clear the picked image
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(50, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 4,
+                    ),
+                  ),
+                ],
               ),
             const SizedBox(width: 8),
             ElevatedButton.icon(

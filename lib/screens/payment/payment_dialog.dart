@@ -56,103 +56,88 @@ class _PaymentDialogState extends State<PaymentDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      child: Padding(
+    return AlertDialog(
+      content: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          margin: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 3,
-                blurRadius: 5,
+        child: Form(
+          // Wrap the content in a Form widget
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Payment Type Dropdown
+              DropdownSearch<String>(
+                decoratorProps: DropDownDecoratorProps(
+                    decoration: InputDecoration(
+                  labelText: 'Payment Type',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  fillColor: Colors.grey[200],
+                  filled: true,
+                )),
+                items: (f, cs) => paymentType,
+                selectedItem: selectedPaymentType,
+                onChanged: (value) {
+                  setState(() {
+                    selectedPaymentType = value;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select the payment type.';
+                  }
+                  return null;
+                },
+                popupProps: const PopupProps.menu(
+                  fit: FlexFit.loose,
+                  constraints: BoxConstraints(),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Amount TextField with same style as dropdown
+              TextFormField(
+                controller: _amountController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Enter Amount',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(
+                        12), // Match the dropdown border radius
+                  ),
+                  fillColor: Colors.grey[200],
+                  // Same background color as dropdown
+                  filled: true, // Ensure it's filled with the color
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter an amount.';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid amount.';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Save Button
+              Center(
+                child: GradientButton(
+                  text: 'Save',
+                  onPressed: () {
+                    if (_formKey.currentState?.validate() ?? false) {
+                      String amount = _amountController.text;
+                      if (amount.isNotEmpty) {
+                        _addPaymentData();
+                      }
+                    }
+                  },
+                ),
               ),
             ],
-          ),
-          child: Form(
-            // Wrap the content in a Form widget
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Payment Type Dropdown
-                DropdownSearch<String>(
-                  decoratorProps: DropDownDecoratorProps(
-                      decoration: InputDecoration(
-                    labelText: 'Payment Type',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    fillColor: Colors.grey[200],
-                    filled: true,
-                  )),
-                  items: (f, cs) => paymentType,
-                  selectedItem: selectedPaymentType,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedPaymentType = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select the payment type.';
-                    }
-                    return null;
-                  },
-                  popupProps: const PopupProps.menu(
-                    fit: FlexFit.loose,
-                    constraints: BoxConstraints(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Amount TextField with same style as dropdown
-                TextFormField(
-                  controller: _amountController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'Enter Amount',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                          12), // Match the dropdown border radius
-                    ),
-                    fillColor: Colors.grey[200],
-                    // Same background color as dropdown
-                    filled: true, // Ensure it's filled with the color
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter an amount.';
-                    }
-                    if (int.tryParse(value) == null) {
-                      return 'Please enter a valid amount.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // Save Button
-                Center(
-                  child: GradientButton(
-                    text: 'Save',
-                    onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        String amount = _amountController.text;
-                        if (amount.isNotEmpty) {
-                          _addPaymentData();
-                        }
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ),

@@ -4,10 +4,11 @@ import 'package:vatsalya_clinic/screens/create_patients/create_patients_bloc.dar
 import 'package:vatsalya_clinic/screens/create_patients/create_patients_screen.dart';
 import 'package:vatsalya_clinic/screens/history_patients_list/history_patients_list_screen.dart';
 import 'package:vatsalya_clinic/screens/profile/profile_page.dart';
+import 'package:vatsalya_clinic/screens/sign_in/sign_in_bloc.dart';
+import 'package:vatsalya_clinic/screens/sign_in/sign_in_event.dart';
+import 'package:vatsalya_clinic/screens/sign_in/sign_in_screen.dart';
 import 'package:vatsalya_clinic/utils/ResponsiveBuilder.dart';
 
-import '../authentication_bloc/authentication_bloc.dart';
-import '../authentication_bloc/authentication_event.dart';
 import '../history_patients_list/history_patients_bloc.dart';
 import 'appointment/todays_appointment_page.dart';
 
@@ -61,23 +62,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 backgroundColor: Colors.transparent,
                 centerTitle: false,
-                // Make AppBar transparent
                 elevation: 0,
-                // Remove shadow
                 automaticallyImplyLeading: false, // Allows the back button
               ),
             ),
           ),
+          backgroundColor: Colors.white,
           body: Row(
-            // AppBar(
-            //   title: const Text(
-            //     'Vatsalya Speech & Hearing Clinic Dashboard',
-            //     style: TextStyle(color: Colors.white),
-            //   ),
-            //   backgroundColor: Colors.blue,
-            //   automaticallyImplyLeading: true, // Blue background for AppBar
-            // ),
-
             children: [
               _buildLeftNavigationBar(),
               Expanded(child: pages[_selectedIndex]),
@@ -117,9 +108,35 @@ class _HomeScreenState extends State<HomeScreen> {
       {bool isSignOut = false}) {
     bool isSelected = _selectedIndex == index;
     return InkWell(
+        hoverColor: Colors.blue,
         onTap: () {
           if (isSignOut) {
-            BlocProvider.of<AuthenticationBloc>(context).add(SignOutEvent());
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content: const Text("Are you sure you want to sign out?"),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text("No")),
+                      TextButton(
+                          onPressed: () {
+                            BlocProvider.of<SignInBloc>(context)
+                                .add(SignOutRequested());
+
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (ctx) => const SignInScreen()),
+                                (Route<dynamic> route) => false);
+                          },
+                          child: const Text("Yes"))
+                    ],
+                  );
+                });
           } else {
             _onItemTapped(index);
           }
@@ -137,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: isSelected ? null : Colors.white,
             // Set color to white if not selected
             border: Border.all(
-              color: isSelected ? Colors.white : Colors.grey.shade500,
+              color: isSelected ? Colors.white : Colors.grey.shade300,
             ),
             shape: BoxShape.rectangle,
             borderRadius: BorderRadius.circular(10.0),

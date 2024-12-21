@@ -82,3 +82,9 @@ Future<List<PatientsModel>> getNamesOfPatientsFromFirestore() async {
 
   return PatientsModelList;
 }
+
+Future<void> removeSpecificData(String key) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove(key); // Removes the data associated with the specified key
+  print("Data removed for key: $key");
+}

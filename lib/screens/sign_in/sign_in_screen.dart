@@ -20,9 +20,13 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  final TextEditingController _emailController = TextEditingController(text: "jinali@gmail.com");
+  final TextEditingController _emailController =
+      // TextEditingController(text: "jinali@gmail.com");
+      TextEditingController();
 
-  final TextEditingController _passwordController = TextEditingController(text: "J@240298");
+  final TextEditingController _passwordController =
+      // TextEditingController(text: "J@240298");
+      TextEditingController();
 
   ValidationUtils validationUtils = ValidationUtils();
 
@@ -85,8 +89,18 @@ class _SignInScreenState extends State<SignInScreen> {
                       BlocBuilder<SignInBloc, SignInState>(
                         builder: (context, state) {
                           if (state is SignInLoading) {
-                            return const Center(
-                                child: CircularProgressIndicator());
+                            return Center(
+                                child: Container(
+                              decoration: const BoxDecoration(
+                                  shape: BoxShape.circle, color: Colors.blue),
+                              child: const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: CircularProgressIndicator(
+                                  backgroundColor: Colors.blue,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ));
                           }
                           return GradientButton(
                             padding: EdgeInsets.all(12.0),
@@ -103,21 +117,6 @@ class _SignInScreenState extends State<SignInScreen> {
                             },
                           );
                         },
-                      ),
-                      const SizedBox(height: 10),
-                      TextButton(
-                        onPressed: () {
-                          // Handle "Forgot Password"
-                        },
-                        child: const Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
                       ),
                       const SizedBox(height: 10),
                       TextButton(

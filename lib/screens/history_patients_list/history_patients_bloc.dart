@@ -14,9 +14,18 @@ class HistoryPatientsBloc
     on<GetPatientList>(_getPatientList);
     on<ExpandCollapsePatientItem>(_manageExpandCollapse);
     on<GetPatientHistory>(_getPatientHistory);
+    on<SelectAppointment>(_selectAppointment);
   }
 
-  // This method handles the SignInRequested event
+  Future _selectAppointment(
+      SelectAppointment event, Emitter<HistoryPatientsState> emit) async {
+    // if (state is HistoryPatientsSuccess) {
+    emit((state as HistoryPatientsSuccess)
+        .copyWith(selectedAppointment: event.selectedAppointment));
+    // }
+  }
+
+// This method handles the SignInRequested event
   Future _getPatientList(
       GetPatientList event, Emitter<HistoryPatientsState> emit) async {
     emit(HistoryPatientsLoading());
@@ -39,7 +48,8 @@ class HistoryPatientsBloc
           patientList: patientsModelList,
           patientHistory: [],
           isPatientHistoryLoading: false,
-          errorMessage: ""));
+          errorMessage: "",
+          selectedAppointment: AppointmentModel.fromJson({})));
     } catch (e) {
       emit(HistoryPatientsFailure(error: e.toString()));
     }
@@ -87,7 +97,10 @@ class HistoryPatientsBloc
 
     if (snapshot.docs.isEmpty) {
       emit((state as HistoryPatientsSuccess).copyWith(
-          isPatientHistoryLoading: false, errorMessage: "No history found."));
+          isPatientHistoryLoading: false,
+          errorMessage: "No history found.",
+          selectedAppointment: AppointmentModel.fromJson({}),
+          patientHistory: []));
     } else {
       List<AppointmentModel> appointments = [];
       for (QueryDocumentSnapshot doc in snapshot.docs) {
@@ -97,6 +110,7 @@ class HistoryPatientsBloc
       emit((state as HistoryPatientsSuccess).copyWith(
           isPatientHistoryLoading: false,
           errorMessage: "",
+          selectedAppointment: AppointmentModel.fromJson({}),
           patientHistory: appointments));
     }
   }

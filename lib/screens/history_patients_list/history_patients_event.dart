@@ -1,6 +1,7 @@
 // sign_in_event.dart
 
 import 'package:equatable/equatable.dart';
+import 'package:vatsalya_clinic/models/appointment_model.dart';
 
 abstract class HistoryPatientsEvent extends Equatable {
   @override
@@ -19,4 +20,10 @@ class GetPatientHistory extends HistoryPatientsEvent {
   final String patientId;
 
   GetPatientHistory(this.patientId);
+}
+
+class SelectAppointment extends HistoryPatientsEvent {
+  final AppointmentModel selectedAppointment;
+
+  SelectAppointment(this.selectedAppointment);
 }

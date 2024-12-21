@@ -19,28 +19,37 @@ class HistoryPatientsSuccess extends HistoryPatientsState {
   final List<AppointmentModel> patientHistory;
   final bool isPatientHistoryLoading;
   final String errorMessage;
+  final AppointmentModel selectedAppointment;
 
   HistoryPatientsSuccess(
       {required this.patientList,
       required this.patientHistory,
       required this.errorMessage,
+      required this.selectedAppointment,
       required this.isPatientHistoryLoading});
 
   HistoryPatientsSuccess copyWith(
           {List<PatientsModel>? patientList,
           List<AppointmentModel>? patientHistory,
           String? errorMessage,
+          AppointmentModel? selectedAppointment,
           bool? isPatientHistoryLoading}) =>
       HistoryPatientsSuccess(
           patientList: patientList ?? this.patientList,
           errorMessage: errorMessage ?? this.errorMessage,
+          selectedAppointment: selectedAppointment ?? this.selectedAppointment,
           isPatientHistoryLoading:
               isPatientHistoryLoading ?? this.isPatientHistoryLoading,
           patientHistory: patientHistory ?? this.patientHistory);
 
   @override
-  List<Object?> get props =>
-      [patientList, patientHistory, isPatientHistoryLoading, errorMessage];
+  List<Object?> get props => [
+        patientList,
+        patientHistory,
+        isPatientHistoryLoading,
+        errorMessage,
+        selectedAppointment
+      ];
 }
 
 class HistoryPatientsFailure extends HistoryPatientsState {

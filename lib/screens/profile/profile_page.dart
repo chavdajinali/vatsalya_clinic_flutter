@@ -27,8 +27,7 @@ class ProfilePage extends StatelessWidget {
             children: [
               // Top card view
               Card(
-                margin: const EdgeInsets.all(16),
-                elevation: 5,
+                margin: const EdgeInsets.all(16),color: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -49,7 +48,7 @@ class ProfilePage extends StatelessWidget {
                           _buildUserDetailRow('Name: ', userDetails.name),
                           _buildUserDetailRow('Email: ', userDetails.email),
                           _buildUserDetailRow('Role: ', userDetails.role),
-                          const SizedBox(height: 20),
+                  /*        const SizedBox(height: 20),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.redAccent,
@@ -77,7 +76,7 @@ class ProfilePage extends StatelessWidget {
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
-                          ),
+                          ),*/
                         ],
                       );
                     },

@@ -30,7 +30,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final GlobalKey<FormState> _registrationFormKey = GlobalKey();
 
-  final List<String> roles = ['superadmin', 'admin', 'receptionist'];
+  final List<String> roles = ['Super Admin', 'Admin', 'Receptionist'];
   String? selectedRole;
 
   ValidationUtils validationUtils = ValidationUtils();
@@ -137,7 +137,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         controller: _userNameController,
         labelText: 'User Name',
         obscureText: false,
-        onValidate: null);
+        onValidate:(value)=>value!.toString().trim().isEmpty?"User name is required.":null );
   }
 
   Widget _buildURoleField(BuildContext context) {
