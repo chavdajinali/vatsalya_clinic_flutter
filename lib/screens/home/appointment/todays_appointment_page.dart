@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/screens/book_appoinment/book_appoinment_screen.dart';
-import 'package:vatsalya_clinic/screens/report/reportScreen.dart';
+import 'package:vatsalya_clinic/screens/report/reportscreen.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
 import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
 import '../../payment/payment_dialog.dart';

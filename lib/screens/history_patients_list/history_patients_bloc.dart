@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
+import 'package:vatsalya_clinic/models/report_model.dart';
 import 'package:vatsalya_clinic/screens/create_patients/create_patients_state.dart';
 
 import '../../models/patients_model.dart';
@@ -19,9 +20,21 @@ class HistoryPatientsBloc
 
   Future _selectAppointment(
       SelectAppointment event, Emitter<HistoryPatientsState> emit) async {
+    QuerySnapshot result = await FirebaseFirestore.instance
+        .collection('report_tbl')
+        .where('patientID', isEqualTo: event.selectedAppointment.patientName)
+        .where('reportDate', isEqualTo: event.selectedAppointment.appointmentDate)
+        .get();
+    List<ReportModel> reports = [];
+    for (QueryDocumentSnapshot doc in result.docs) {
+      reports.add(ReportModel.fromJson(doc.data()
+          as Map<String, dynamic>)); // Assuming 'name' is the field for names
+    }
+
     // if (state is HistoryPatientsSuccess) {
-    emit((state as HistoryPatientsSuccess)
-        .copyWith(selectedAppointment: event.selectedAppointment));
+    emit((state as HistoryPatientsSuccess).copyWith(
+        selectedAppointment:
+            event.selectedAppointment.copyWith(reports: reports)));
     // }
   }
 

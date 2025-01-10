@@ -84,34 +84,49 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
             ),
             const SizedBox(height: 16),
             buildTextField(
-                controller: TextEditingController(text: gender),
-                onTap: () => CustomPicker.show(
-                      context: context,
-                      items: genderList,
-                      title: 'Select Gender',
-                      onSelected: (value) {
-                        setState(() {
-                          gender = value;
-                        });
-                      },
-                    ),
-                readOnly: true,
-                labelText: 'Select Gender',
-                decoration: InputDecoration(
-                  labelText: "Select Gender",
-                  suffixIcon: const Icon(Icons.arrow_drop_down),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+              controller: TextEditingController(text: gender),
+              labelText: 'Gender',
+              onTap: () async {
+                final selectedGender = await showModalBottomSheet<String>(
+                  context: context,
+                  builder: (context) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: genderList
+                          .map((g) => ListTile(
+                        title: Text(g),
+                        onTap: () => Navigator.of(context).pop(g),
+                      ))
+                          .toList(),
+                    );
+                  },
+                );
+                if (selectedGender != null) {
+                  setState(() {
+                    gender = selectedGender;
+                  });
+                }
+              },
+              readOnly: true,
+              decoration: InputDecoration(
+                labelText: 'Gender',
+                suffixIcon: const Icon(Icons.arrow_drop_down),
+                filled: true,
+                fillColor: Colors.grey[200],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
-                obscureText: false,
-                onValidate: (value) =>
-                    value == null ? 'Please select a gender' : null),
+                contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+              ),
+              onValidate: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a gender';
+                }
+                return null;
+              },
+              obscureText: false,
+            ),
             const SizedBox(height: 16),
             buildTextField(
               controller: mobileController,

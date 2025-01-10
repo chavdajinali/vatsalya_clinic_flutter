@@ -22,7 +22,8 @@ class Addbookappoinmentfirestoreservice {
           appointmentChiefComplain: chief_complain,
           isPayment: false,
           paymentAmount: "",
-          paymentType: "");
+          paymentType: "",
+          reports: []);
 
       refId.set(newAppointment.toJson());
       print('Appointment added successfully!');

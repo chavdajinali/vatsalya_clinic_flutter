@@ -4,6 +4,7 @@ import 'package:vatsalya_clinic/screens/sign_in/sign_in_bloc.dart';
 import 'package:vatsalya_clinic/screens/sign_in/sign_in_event.dart';
 import 'package:vatsalya_clinic/screens/sign_in/sign_in_state.dart';
 import 'package:vatsalya_clinic/utils/GradientText.dart';
+import 'package:vatsalya_clinic/utils/app_loading_indicator.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
 import 'package:vatsalya_clinic/utils/textfield_builder.dart';
 import 'package:vatsalya_clinic/utils/validation_util.dart';
@@ -53,7 +54,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          HomeScreen(), // Navigate to HomeScreen
+                          const HomeScreen(), // Navigate to HomeScreen
                     ),
                   );
                 } else if (state is SignInFailure) {
@@ -89,21 +90,10 @@ class _SignInScreenState extends State<SignInScreen> {
                       BlocBuilder<SignInBloc, SignInState>(
                         builder: (context, state) {
                           if (state is SignInLoading) {
-                            return Center(
-                                child: Container(
-                              decoration: const BoxDecoration(
-                                  shape: BoxShape.circle, color: Colors.blue),
-                              child: const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CircularProgressIndicator(
-                                  backgroundColor: Colors.blue,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ));
+                            return const AppLoadingIndicator();
                           }
                           return GradientButton(
-                            padding: EdgeInsets.all(12.0),
+                            padding: const EdgeInsets.all(12.0),
                             text: 'Sign In',
                             onPressed: () {
                               if (_signInFormKey.currentState!.validate()) {
@@ -158,7 +148,8 @@ class _SignInScreenState extends State<SignInScreen> {
       controller: _passwordController,
       labelText: 'Password',
       obscureText: true,
-      onValidate: validationUtils.validatePassword,
+      onValidate: (value) =>
+          value.toString().trim().isEmpty ? "Password is required." : null,
     );
   }
 }

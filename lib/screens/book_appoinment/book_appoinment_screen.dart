@@ -83,7 +83,7 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
     }
     patientsList = await getNamesOfPatientsFromFirestore();
     setState(() {
-      for (int i = 0; i <= patientsList.length; i++) {
+      for (int i = 0; i < patientsList.length; i++) {
         patientsNameOptions.add(patientsList[i].name);
       }
     });

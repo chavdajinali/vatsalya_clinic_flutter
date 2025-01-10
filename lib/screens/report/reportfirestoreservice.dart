@@ -30,19 +30,12 @@ class Reportfirestoreservice {
     );
 
     try {
-      final storageRef =
-          FirebaseStorage.instance.ref("reports/$report_image_name");
-      final uploadTask = await storageRef.putFile(File(report_image));
-
-      final downloadUrl = await uploadTask.ref.getDownloadURL();
-
-      newReport.reportImage = downloadUrl;
 
       await FirebaseFirestore.instance
           .collection('report_tbl')
           .add(newReport.toJson());
       print('report added successfully!');
-      return 'report added successfully!';
+      return 'success';
     } catch (e) {
       print('Error adding report: $e');
       return 'Error adding report: $e';

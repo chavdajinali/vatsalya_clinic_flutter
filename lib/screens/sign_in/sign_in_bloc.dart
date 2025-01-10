@@ -26,11 +26,11 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
   Future<void> _onSignInRequested(
       SignInRequested event, Emitter<SignInState> emit) async {
     // Validate email and password
-    String? validationError = _validateCredentials(event.email, event.password);
-    if (validationError != null) {
-      emit(SignInValidationError(error: validationError));
-      return;
-    }
+    // String? validationError = _validateCredentials(event.email, event.password);
+    // if (validationError != null) {
+    //   emit(SignInValidationError(error: validationError));
+    //   return;
+    // }
 
     emit(SignInLoading());
 

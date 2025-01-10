@@ -87,18 +87,29 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       // Green background for navigation items
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
-          _buildNavItem(Icons.home, "Home", 0),
-          const SizedBox(height: 20),
-          _buildNavItem(Icons.person_2_rounded, 'Profile', 1),
-          const SizedBox(height: 20),
-          _buildNavItem(Icons.person_add, "Create Patient", 2),
-          const SizedBox(height: 20),
-          _buildNavItem(Icons.history, "History of Patients", 3),
-          const SizedBox(height: 20),
-          _buildNavItem(Icons.exit_to_app, "Sign Out", 4, isSignOut: true),
-          const SizedBox(height: 20),
+          Expanded(
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                _buildNavItem(Icons.home, "Home", 0),
+                const SizedBox(height: 20),
+                _buildNavItem(Icons.person_2_rounded, 'Profile', 1),
+                const SizedBox(height: 20),
+                _buildNavItem(Icons.person_add, "Create Patient", 2),
+                const SizedBox(height: 20),
+                _buildNavItem(Icons.history, "History of Patients", 3),
+                const SizedBox(height: 20),
+                _buildNavItem(Icons.exit_to_app, "Sign Out", 4, isSignOut: true),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text("Version 1.0.0 | 2024 \nDeveloped by: Jinali Chavda",style: TextStyle(fontSize: 10),),
+          )
         ],
       ),
     );

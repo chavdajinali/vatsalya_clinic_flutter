@@ -1,24 +1,40 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart'; // For kIsWeb
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/utils/CustomPicker.dart';
+import 'package:vatsalya_clinic/utils/app_loading_indicator.dart';
+import 'package:vatsalya_clinic/utils/app_utils.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
 import 'package:vatsalya_clinic/utils/textfield_builder.dart';
 import 'reportfirestoreservice.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ReportScreen extends StatefulWidget {
   final AppointmentModel appointment;
-  ReportScreen(this.appointment);
+
+  const ReportScreen(this.appointment, {super.key});
 
   @override
   _ReportScreenState createState() => _ReportScreenState();
 }
 
 class _ReportScreenState extends State<ReportScreen> {
-  final List<String> reportNames = ['PTA', 'Impedance', 'ETF Test','OAE Test','BERA Test','ASSR Test','Speech Assessment','Special Test','Bill'];
+  final List<String> reportNames = [
+    'PTA',
+    'Impedance',
+    'ETF Test',
+    'OAE Test',
+    'BERA Test',
+    'ASSR Test',
+    'Speech Assessment',
+    'Special Test',
+    'Bill'
+  ];
   String? selectedReport;
   final ImagePicker _picker = ImagePicker();
   XFile? imageFile;
@@ -29,20 +45,34 @@ class _ReportScreenState extends State<ReportScreen> {
 
   // Variable to hold patient data from Firestore
   Map<String, dynamic>? patientData;
+
   // List to store the reports and images
   List<Map<String, dynamic>> reports = [];
-
+  String? base64String;
+  var isLoading = false;
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final pickedFile = await _picker.pickImage(source: source);
+      final pickedFile =
+          await _picker.pickImage(source: source, imageQuality: 20);
       if (pickedFile != null) {
+        var bytes = await pickedFile.readAsBytes();
         setState(() {
+          // Update the image file with the compressed file
           imageFile = pickedFile;
+
+          // Update the base64 string
+          base64String = base64Encode(bytes);
+
+          if (kDebugMode) {
+            print('Base64 String: $base64String');
+          }
         });
       }
     } catch (e) {
-      print("Error picking image: $e");
+      if (kDebugMode) {
+        print("Error picking image: $e");
+      }
     }
   }
 
@@ -64,55 +94,71 @@ class _ReportScreenState extends State<ReportScreen> {
         mobileController.text = patientData?['mobile'] ?? '';
         addressController.text = patientData?['address'] ?? '';
       } else {
-        print("No patient found with this name as the document ID.");
+        if (kDebugMode) {
+          print("No patient found with this name as the document ID.");
+        }
       }
     } catch (e) {
-      print("Error fetching patient data: $e");
+      if (kDebugMode) {
+        print("Error fetching patient data: $e");
+      }
     }
   }
 
-  // Function to handle Save button click
-  void saveReport() {
+  Future<String?> uploadImageToFirebaseStorage(
+      Map<String, dynamic> report, String patientId) async {
+    try {
+      var timestamp = DateFormat("ddMMyyyyHHmmss").format(DateTime.now());
+      final storageRef = FirebaseStorage.instance.ref().child(
+          'reports/$patientId/${report["name"]}/${timestamp}_${report["image_name"]}');
+
+      TaskSnapshot snapshot;
+
+      if (kIsWeb) {
+        // For web, use `putData` with the file bytes
+        // final bytes = await imageFile.readAsBytes();
+        snapshot = await storageRef.putData(base64Decode(report["base64"]));
+      } else {
+        // For mobile, use `putFile` with a `File` object
+        snapshot = await storageRef.putFile(File(report["image"]));
+      }
+      return await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error uploading image to Firebase Storage: $e");
+      }
+      return null;
+    }
+  }
+
+  Future<void> saveReport() async {
     if (selectedReport != null && imageFile != null) {
-      // Save the report name and image to the list
+      var fileLength = (await imageFile!.length()) / 1024;
+
       setState(() {
         reports.add({
-          'reportname': selectedReport,
-          'reportimage': imageFile!.path,
-          'reportimage_name' : imageFile!.name
+          'name': selectedReport,
+          'image': imageFile!.path, // Save the Firebase Storage URL
+          'base64': base64String, // Save the Firebase Storage URL
+          'image_name': imageFile!.name,
+          'length': "${fileLength.toStringAsFixed(2)} kb",
         });
-      });
 
-      // Clear the selected report and image after saving
-      setState(() {
+        // Show Snackbar before clearing the values
+        showSnackBar("Report saved: $selectedReport", context);
+
+        // Clear the selected report and image
         selectedReport = null;
         imageFile = null;
+        base64String = "";
       });
-      // Show SnackBar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Report saved: $selectedReport"),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-      print("Report saved: $selectedReport");
-    } else {
-      // Show SnackBar
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please select a report and pick an image."),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      print("Please select a report and pick an image");
-    }
-  }
 
-  // Sort the reports list by report name
-  List<Map<String, dynamic>> sortedReports() {
-    List<Map<String, dynamic>> sorted = List.from(reports);
-    sorted.sort((a, b) => a['reportname'].compareTo(b['reportname']));
-    return sorted;
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      showSnackBar("Please select a report and pick an image.", context);
+    }
   }
 
   void removeAddedReportFromList(int index) {
@@ -121,50 +167,54 @@ class _ReportScreenState extends State<ReportScreen> {
     });
 
     // Show SnackBar for confirmation
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Report removed"),
-        duration: Duration(seconds: 2),
-      ),
-    );
+    showSnackBar("Report removed!", context);
   }
 
   Future<void> submitReportData() async {
-    if (sortedReports().isNotEmpty) {
-      if (sortedReports().length == 1) {
-        print('Patient ID: ${widget.appointment.patientName.toString()}');
-        print('Report Name: ${sortedReports()[0]['reportname']}');
-        print('Report Image Path: ${sortedReports()[0]['reportimage']}');
-        print('Report Date: ${widget.appointment.appointmentDate.toString()}');
-        print('Report Image Name: ${sortedReports()[0]['reportimage_name']}');
+    if (reports.isNotEmpty) {
+      setState(() {
+        isLoading = true;
+      });
 
-        String? result = await Reportfirestoreservice().addReport(
+      var successCount = 0;
+      for (int i = 0; i < reports.length; i++) {
+        // Upload image to Firebase Storage and get the URL
+        String? downloadUrl = await uploadImageToFirebaseStorage(
+          reports[i],
+          widget.appointment.patientName.toString(),
+        );
+
+        if (downloadUrl == null) {
+          continue;
+        }
+
+        var result = await Reportfirestoreservice().addReport(
           patients_id: widget.appointment.patientName.toString(),
-          report_name: sortedReports()[0]['reportname'],
-          report_image: sortedReports()[0]['reportimage'],
+          report_name: reports[i]['name'],
+          report_image: downloadUrl,
+          // Use the download URL
           report_date: widget.appointment.appointmentDate.toString(),
-          report_image_name: '${widget.appointment.patientName.toString()}:${sortedReports()[0]['reportimage_name']}',
+          report_image_name:
+              '${reports[i]['image_name']}',
+        );
 
-    );
-      }else if (sortedReports().length > 1){
-          for (int i=0;i<sortedReports().length;i++) {
-            String? result = await Reportfirestoreservice().addReport(
-              patients_id: widget.appointment.patientName.toString(),
-              report_name: sortedReports()[i]['reportname'],
-              report_image: sortedReports()[i]['reportimage'],
-              report_date: widget.appointment.appointmentDate.toString(),
-              report_image_name: '${widget.appointment.patientName.toString()}:${sortedReports()[i]['reportimage_name']}',
-            );
-          }
+        if (result == "success") {
+          successCount++;
+        }
       }
-    }else{
-      // Show SnackBar for confirmation
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please Enter Report."),
-          duration: Duration(seconds: 2),
-        ),
-      );
+
+      setState(() {
+        isLoading = false;
+      });
+
+      if (successCount == reports.length) {
+        showSnackBar("Reports saved successfully!", context);
+        Navigator.pop(context);
+      } else {
+        showSnackBar("Failed to save some reports. Please try again.", context);
+      }
+    } else {
+      showSnackBar("Please select Reports.", context);
     }
   }
 
@@ -174,15 +224,30 @@ class _ReportScreenState extends State<ReportScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 16),
-        buildTextField(controller: nameController, labelText: 'Name', readOnly: true, obscureText: false),
+        buildTextField(
+            controller: nameController,
+            labelText: 'Name',
+            readOnly: true,
+            obscureText: false),
         const SizedBox(height: 16),
-        buildTextField(controller: ageController, labelText: 'Age', readOnly: true, obscureText: false),
+        buildTextField(
+            controller: ageController,
+            labelText: 'Age',
+            readOnly: true,
+            obscureText: false),
         const SizedBox(height: 16),
-        buildTextField(controller: mobileController, labelText: 'Mobile', readOnly: true, obscureText: false),
+        buildTextField(
+            controller: mobileController,
+            labelText: 'Mobile',
+            readOnly: true,
+            obscureText: false),
         const SizedBox(height: 16),
-        buildTextField(controller: addressController, labelText: 'Address', readOnly: true, obscureText: false),
+        buildTextField(
+            controller: addressController,
+            labelText: 'Address',
+            readOnly: true,
+            obscureText: false),
         const SizedBox(height: 16),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -210,7 +275,8 @@ class _ReportScreenState extends State<ReportScreen> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                 ),
                 obscureText: false,
               ),
@@ -234,22 +300,28 @@ class _ReportScreenState extends State<ReportScreen> {
               Row(
                 children: [
                   GestureDetector(
-                    onTap: () => _pickImage(ImageSource.gallery), // Allow user to replace the image
+                    onTap: () => _pickImage(ImageSource.gallery),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: kIsWeb
-                          ? Image.network(
-                        imageFile!.path, // Web: Network path
-                        width: 120,
-                        height: 50,
-                        fit: BoxFit.cover,
-                      )
-                          : Image.file(
-                        File(imageFile!.path), // Mobile: Local file
-                        width: 120,
-                        height: 50,
-                        fit: BoxFit.cover,
-                      ),
+                          ? (base64String != null
+                              ? Image.memory(
+                                  base64Decode(base64String!),
+                                  width: 120,
+                                  height: 50,
+                                  fit: BoxFit.cover,
+                                )
+                              : const Icon(Icons.image,
+                                  size: 50, color: Colors.grey))
+                          : (imageFile != null
+                              ? Image.file(
+                                  File(imageFile!.path),
+                                  width: 120,
+                                  height: 50,
+                                  fit: BoxFit.cover,
+                                )
+                              : const Icon(Icons.image,
+                                  size: 50, color: Colors.grey)),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -289,51 +361,57 @@ class _ReportScreenState extends State<ReportScreen> {
           ],
         ),
         const SizedBox(height: 20),
-        if (sortedReports().isNotEmpty)
+        if (reports.isNotEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: Text("Selected reports data:"),
+            child: Text("Selected reports:"),
           ),
         Expanded(
           child: ListView.builder(
-            itemCount: sortedReports().length,
+            itemCount: reports.length,
             itemBuilder: (context, index) {
-              final report = sortedReports()[index];
+              final report = reports[index];
               return Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: ListTile(
-                  trailing: IconButton(onPressed: () => removeAddedReportFromList(index), icon: const Icon(Icons.close)),
-                  leading: kIsWeb
-                      ? Image.network(
-                    report['reportimage'], // Web: Network path
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  )
-                      : Image.file(
-                    File(report['reportimage']), // Mobile: Local file
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  ),
-                  title: Text(report['reportname']),
+                  trailing: IconButton(
+                      onPressed: () => removeAddedReportFromList(index),
+                      icon: const Icon(Icons.close)),
+                  leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: kIsWeb
+                          ? Image.memory(
+                              base64Decode(report["base64"]),
+                              width: 120,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              File(report["image"]),
+                              width: 120,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            )),
+                  title: Text(report['name']),
+                  subtitle: Text(report['length']),
                 ),
               );
             },
           ),
         ),
         const SizedBox(height: 20),
-        Center(
-          child: GradientButton(
-            padding: const EdgeInsets.all(12.0),
-            text: 'Submit Report',
-            onPressed: submitReportData,
-          ),
-        ),
+        isLoading
+            ? const AppLoadingIndicator()
+            : Center(
+                child: GradientButton(
+                  padding: const EdgeInsets.all(12.0),
+                  text: 'Submit Reports',
+                  onPressed: submitReportData,
+                ),
+              ),
       ],
     );
   }
-
 
   @override
   void initState() {
