@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildLeftNavigationBar() {
     return Container(
-      width: 210,
+      width: 230,
       // Set the width of the sidebar
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -101,14 +101,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 20),
                 _buildNavItem(Icons.history, "History of Patients", 3),
                 const SizedBox(height: 20),
-                _buildNavItem(Icons.exit_to_app, "Sign Out", 4, isSignOut: true),
+                _buildNavItem(Icons.exit_to_app, "Sign Out", 4,
+                    isSignOut: true),
                 const SizedBox(height: 20),
               ],
             ),
           ),
           const Padding(
             padding: EdgeInsets.all(8.0),
-            child: Text("Version 1.0.0 | 2024 \nDeveloped by: Jinali Chavda",style: TextStyle(fontSize: 10),),
+            child: Text(
+              "Version 1.0.0 | 2024 \nDeveloped by: Jinali Chavda",
+              style: TextStyle(fontSize: 10),
+            ),
           )
         ],
       ),
@@ -176,12 +180,14 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Icon(icon, color: isSelected ? Colors.white : Colors.grey),
                 const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.grey,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.grey,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
                   ),
                 ),
               ],
