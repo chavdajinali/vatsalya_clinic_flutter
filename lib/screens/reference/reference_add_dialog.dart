@@ -24,12 +24,12 @@ class _ReferenceAddDialogState extends State<ReferenceAddDialog> {
         content: Text("Please Enter Reference Name."),
         duration: Duration(seconds: 2),
       ));
-      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return  Dialog(
+    return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -67,10 +67,13 @@ class _ReferenceAddDialogState extends State<ReferenceAddDialog> {
                                 _addReferenceData();
                               }
                             }
-                          }))
+                          }
+                          )
+                  )
                 ],
               ),
-            )),
+            )
+        ),
       ),
     );
   }

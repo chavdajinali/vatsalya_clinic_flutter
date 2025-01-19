@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "846259022190",
+    "project_id": "vatsalyaclinicproject",
+    "storage_bucket": "vatsalyaclinicproject.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:846259022190:android:18ddb8654bd3fbaa17b97f",
+        "android_client_info": {
+          "package_name": "com.vatsalyaclinic"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2ck0LuiH6q-P1nD9sSygwJXuUqCTykSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
