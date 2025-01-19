@@ -8,6 +8,7 @@ import 'package:vatsalya_clinic/screens/sign_in/sign_in_bloc.dart';
 import 'package:vatsalya_clinic/screens/sign_in/sign_in_event.dart';
 import 'package:vatsalya_clinic/screens/sign_in/sign_in_screen.dart';
 import 'package:vatsalya_clinic/utils/ResponsiveBuilder.dart';
+import 'package:vatsalya_clinic/screens/reference/reference_add_list.dart';
 
 import '../history_patients_list/history_patients_bloc.dart';
 import 'appointment/todays_appointment_page.dart';
@@ -32,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     BlocProvider(
         create: (BuildContext context) => HistoryPatientsBloc(),
         child: const HistoryPatientsListScreen()),
+    const ReferenceAddList(),
   ];
 
   void _onItemTapped(int index) {
@@ -101,7 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 20),
                 _buildNavItem(Icons.history, "History of Patients", 3),
                 const SizedBox(height: 20),
-                _buildNavItem(Icons.exit_to_app, "Sign Out", 4,
+                _buildNavItem(Icons.person, 'Reference', 4),
+                const SizedBox(height: 20),
+                _buildNavItem(Icons.exit_to_app, "Sign Out", 5,
                     isSignOut: true),
                 const SizedBox(height: 20),
               ],

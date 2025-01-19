@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/models/patients_model.dart';
-import 'package:vatsalya_clinic/models/refrence_by_model.dart';
+import 'package:vatsalya_clinic/models/refrence_model.dart';
 import 'package:vatsalya_clinic/models/user_model.dart';
 
 Future<void> storeLoginDetails(UserModel userDetails) async {
