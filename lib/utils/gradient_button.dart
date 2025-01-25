@@ -1,13 +1,18 @@
+
 import 'package:flutter/material.dart';
+
+import '../main.dart';
 
 class GradientButton extends StatelessWidget {
   final String text;
+  final double? fontsize;
   final VoidCallback onPressed;
   final EdgeInsets? padding;
 
   const GradientButton({
     Key? key,
     required this.text,
+    this.fontsize,
     required this.onPressed,
     this.padding,
   }) : super(key: key);
@@ -29,10 +34,10 @@ class GradientButton extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 14,
+            fontSize: fontsize ?? 14,
           ),
         ),
       ),

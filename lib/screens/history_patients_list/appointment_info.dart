@@ -1,6 +1,4 @@
 import 'dart:typed_data';
-
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:vatsalya_clinic/components/AppLabelValue.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
@@ -14,8 +12,31 @@ class AppointmentInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check if the device is desktop
+    bool isDesktop = MediaQuery.of(context).size.width >= 600; // Adjust threshold as needed
+
+    // If not desktop, show as a dialog
+    if (!isDesktop) {
+      return Dialog(
+        child: _buildContent(context),
+      );
+    }
+
+    // If desktop, show as a regular widget
     return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+      padding: const EdgeInsets.all(16.0),
+      child: _buildContent(context),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    // Get the screen width to adjust padding and font sizes
+    double screenWidth = MediaQuery.of(context).size.width;
+    double padding = screenWidth < 600 ? 8.0 : 16.0; // Adjust padding for mobile
+    double fontSize = screenWidth < 600 ? 14.0 : 16.0; // Adjust font size for mobile
+
+    return Padding(
+      padding: EdgeInsets.all(padding),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,211 +45,169 @@ class AppointmentInfo extends StatelessWidget {
             "Appointment Details",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(
-            height: 8,
-          ),
+          const SizedBox(height: 8),
           AppLabelValue(
               label: "Chief Complaint",
               value: appointmentData.appointmentChiefComplain ?? 'N/A'),
-          const SizedBox(
-            height: 8,
-          ),
+          const SizedBox(height: 8),
           AppLabelValue(
               label: "Reference",
               value: appointmentData.appointmentReferenceBy ?? 'N/A'),
-          const SizedBox(
-            height: 8,
-          ),
+          const SizedBox(height: 8),
           appointmentData.paymentAmount.isEmpty
               ? const AppLabelValue(label: "Payment", value: "Pending")
               : Column(
-                  children: [
-                    AppLabelValue(
-                        label: "Payment Type",
-                        value: appointmentData.paymentType ?? "N/A"),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    AppLabelValue(
-                        label: "Payment Amount",
-                        value: appointmentData.paymentAmount ?? "N/A"),
-                  ],
-                ),
-
+            children: [
+              AppLabelValue(
+                  label: "Payment Type",
+                  value: appointmentData.paymentType ?? "N/A"),
+              const SizedBox(height: 8),
+              AppLabelValue(
+                  label: "Payment Amount",
+                  value: appointmentData.paymentAmount ?? "N/A"),
+            ],
+          ),
           const SizedBox(height: 16),
-          // Display the image
           const Text(
             "Reports",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          // const SizedBox(height: 8),
           appointmentData.reports.isEmpty
               ? const Text("No reports found.")
               : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: appointmentData.reports
-                      .asMap()
-                      .entries
-                      .map<Widget>((entry) {
-                    int index = entry.key;
-                    var report = entry.value;
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: appointmentData.reports
+                .asMap()
+                .entries
+                .map<Widget>((entry) {
+              int index = entry.key;
+              var report = entry.value;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Row(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: Row(
-                            children: [
-                              Text(
-                                report.reportName,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                              const SizedBox(
-                                width: 16,
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return Dialog(
-                                          child: Stack(
-                                            fit: StackFit.loose,
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                child: Image.network(
-                                                  report.reportImage,
-                                                  // fit: BoxFit.cover,
-                                                  loadingBuilder:
-                                                      (BuildContext context,
-                                                          Widget child,
-                                                          ImageChunkEvent?
-                                                              loadingProgress) {
-                                                    if (loadingProgress ==
-                                                        null) {
-                                                      return child;
-                                                    }
-                                                    return Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        value: loadingProgress
-                                                                    .expectedTotalBytes !=
-                                                                null
-                                                            ? loadingProgress
-                                                                    .cumulativeBytesLoaded /
-                                                                (loadingProgress
-                                                                        .expectedTotalBytes ??
-                                                                    1)
-                                                            : null,
-                                                      ),
-                                                    );
-                                                  },
-                                                  errorBuilder: (BuildContext
-                                                          context,
-                                                      Object error,
-                                                      StackTrace? stackTrace) {
-                                                    return const Icon(
-                                                        Icons.broken_image,
-                                                        size: 50,
-                                                        color: Colors.grey);
-                                                  },
-                                                ),
-                                              ),
-                                              Positioned(
-                                                // right: 16,
-                                                top: 16, right: 1,
-                                                child: Row(
-                                                  children: [
-                                                    IconButton(
-                                                        onPressed: () {
-                                                          downloadImage(report
-                                                              .reportImage);
-                                                        },
-                                                        icon: const Icon(
-                                                          Icons.download,
-                                                          color: Colors.white,
-                                                        )),
-                                                    IconButton(
-                                                        onPressed: () {
-                                                          Navigator.pop(
-                                                              context);
-                                                        },
-                                                        icon: const Icon(
-                                                          Icons.close,
-                                                          color: Colors.white,
-                                                        ))
-                                                  ],
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        );
-                                      });
-                                },
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(
-                                    report.reportImage,
-                                    width: 120,
-                                    height: 50,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder: (BuildContext context,
-                                        Widget child,
-                                        ImageChunkEvent? loadingProgress) {
-                                      if (loadingProgress == null) {
-                                        return child;
-                                      }
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  (loadingProgress
-                                                          .expectedTotalBytes ??
-                                                      1)
-                                              : null,
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder: (BuildContext context,
-                                        Object error, StackTrace? stackTrace) {
-                                      return const Icon(Icons.broken_image,
-                                          size: 50, color: Colors.grey);
-                                    },
-                                  ),
-                                ),
-                              )
-                            ],
+                        Expanded(
+                          child: Text(
+                            report.reportName,
+                            style: TextStyle(fontSize: fontSize),
                           ),
                         ),
-                        if (index != appointmentData.reports.length - 1)
-                          const Divider(
-                            height: 1,
-                            thickness: 0.5,
+                        const SizedBox(width: 16),
+                        InkWell(
+                          onTap: () {
+                            _showReportDialog(context, report);
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              report.reportImage,
+                              width: 120,
+                              height: 50,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (BuildContext context,
+                                  Widget child,
+                                  ImageChunkEvent? loadingProgress) {
+                                if (loadingProgress == null) {
+                                  return child;
+                                }
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress
+                                        .expectedTotalBytes !=
+                                        null
+                                        ? loadingProgress.cumulativeBytesLoaded /
+                                        (loadingProgress.expectedTotalBytes ?? 1)
+                                        : null,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (BuildContext context,
+                                  Object error, StackTrace? stackTrace) {
+                                return const Icon(Icons.broken_image,
+                                    size: 50, color: Colors.grey);
+                              },
+                            ),
                           ),
+                        )
                       ],
-                    );
-                  }).toList(),
-                )
+                    ),
+                  ),
+                  if (index != appointmentData .reports.length - 1)
+                    const Divider(height: 1, thickness: 0.5),
+                ],
+              );
+            }).toList(),
+          )
         ],
       ),
     );
   }
 
+  void _showReportDialog(BuildContext context, var report) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: Stack(
+            fit: StackFit.loose,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  report.reportImage,
+                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                            (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
+                      ),
+                    );
+                  },
+                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                    return const Icon(Icons.broken_image, size: 50, color: Colors.grey);
+                  },
+                ),
+              ),
+              Positioned(
+                top: 16,
+                right: 1,
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        downloadImage(report.reportImage);
+                      },
+                      icon: const Icon(Icons.download, color: Colors.white),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.close, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> downloadImage(String url) async {
     try {
-      // Fetch the image data
       final response = await http.get(Uri.parse(url));
-
       if (response.statusCode == 200) {
-        // Convert image data to a byte array
         Uint8List bytes = response.bodyBytes;
-
-        // Create a blob and download it
         final blob = html.Blob([bytes]);
         final url = html.Url.createObjectUrlFromBlob(blob);
         final anchor = html.AnchorElement(href: url)

@@ -16,6 +16,7 @@ class HistoryPatientsBloc
     on<ExpandCollapsePatientItem>(_manageExpandCollapse);
     on<GetPatientHistory>(_getPatientHistory);
     on<SelectAppointment>(_selectAppointment);
+    on<FilterPatientsByDate>(_filterPatientsByDate);
   }
 
   Future _selectAppointment(
@@ -23,7 +24,8 @@ class HistoryPatientsBloc
     QuerySnapshot result = await FirebaseFirestore.instance
         .collection('report_tbl')
         .where('patientID', isEqualTo: event.selectedAppointment.patientName)
-        .where('reportDate', isEqualTo: event.selectedAppointment.appointmentDate)
+        .where('reportDate',
+            isEqualTo: event.selectedAppointment.appointmentDate)
         .get();
     List<ReportModel> reports = [];
     for (QueryDocumentSnapshot doc in result.docs) {
@@ -127,4 +129,44 @@ class HistoryPatientsBloc
           patientHistory: appointments));
     }
   }
+
+  Future<void> _filterPatientsByDate(
+      FilterPatientsByDate event, Emitter<HistoryPatientsState> emit) async {
+    if (state is HistoryPatientsSuccess) {
+      var successState = state as HistoryPatientsSuccess;
+
+      try {
+        // Parse the date strings into DateTime objects
+        DateTime startDate = DateTime.parse(event.startDate);
+        DateTime endDate = DateTime.parse(event.endDate);
+
+        // Fetch patients from Firestore whose appointments fall within the date range
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('patients_tbl')
+            .get();
+
+        List<PatientsModel> filteredPatients = [];
+
+        for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+          var patient = PatientsModel.fromJson(doc.data() as Map<String, dynamic>);
+          QuerySnapshot appointmentSnapshot = await FirebaseFirestore.instance
+              .collection('appointment_tbl')
+              .where('patients_name', isEqualTo: patient.id)
+              .where('appointment_date',
+              isGreaterThanOrEqualTo: event.startDate)
+              .where('appointment_date', isLessThanOrEqualTo: event.endDate)
+              .get();
+
+          if (appointmentSnapshot.docs.isNotEmpty) {
+            filteredPatients.add(patient);
+          }
+        }
+
+        emit(successState.copyWith(patientList: filteredPatients));
+      } catch (e) {
+        emit(HistoryPatientsFailure(error: e.toString()));
+      }
+    }
+  }
+
 }

@@ -13,7 +13,7 @@ class GradientText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShaderMask(
-      shaderCallback: (bounds) => LinearGradient(
+      shaderCallback: (bounds) => const LinearGradient(
         colors: [Colors.blue, Colors.green],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,

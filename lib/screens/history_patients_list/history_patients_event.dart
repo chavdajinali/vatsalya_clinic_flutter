@@ -27,3 +27,11 @@ class SelectAppointment extends HistoryPatientsEvent {
 
   SelectAppointment(this.selectedAppointment);
 }
+
+
+class FilterPatientsByDate extends HistoryPatientsEvent {
+  final String startDate;
+  final String endDate;
+
+  FilterPatientsByDate({required this.startDate, required this.endDate});
+}

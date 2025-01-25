@@ -11,6 +11,7 @@ import 'package:vatsalya_clinic/utils/app_loading_indicator.dart';
 import 'package:vatsalya_clinic/utils/app_utils.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
 import 'package:vatsalya_clinic/utils/textfield_builder.dart';
+import '../../main.dart';
 import 'reportfirestoreservice.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -194,8 +195,7 @@ class _ReportScreenState extends State<ReportScreen> {
           report_image: downloadUrl,
           // Use the download URL
           report_date: widget.appointment.appointmentDate.toString(),
-          report_image_name:
-              '${reports[i]['image_name']}',
+          report_image_name: '${reports[i]['image_name']}',
         );
 
         if (result == "success") {
@@ -276,86 +276,82 @@ class _ReportScreenState extends State<ReportScreen> {
                     borderSide: BorderSide.none,
                   ),
                   contentPadding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                 ),
                 obscureText: false,
               ),
             ),
             const SizedBox(width: 16),
             if (imageFile == null)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.photo_library),
-                label: const Text('Gallery'),
-                onPressed: () => _pickImage(ImageSource.gallery),
+              Expanded(
+                child: ElevatedButton.icon(
+                  icon: Icon(Icons.photo_library,size: isDesktop ? 16 : 12),
+                  label: Text('Gallery',style: TextStyle(fontSize: isDesktop ? 16 : 12)),
+                  onPressed: () => _pickImage(ImageSource.gallery),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: isDesktop ? const Size(120, 50) : const Size(60, 40),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    elevation: 4,
+                  ),
+                ),
+              )
+            else
+              Expanded(
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => _pickImage(ImageSource.gallery),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: kIsWeb
+                            ? (base64String != null
+                            ? Image.memory(
+                          base64Decode(base64String!),
+                          width: isDesktop ? 120 : 80,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        )
+                            : const Icon(Icons.image,
+                            size: 50, color: Colors.grey))
+                            : (imageFile != null
+                            ? Image.file(
+                          File(imageFile!.path),
+                          width: isDesktop ? 120 : 80,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        )
+                            : const Icon(Icons.image,
+                            size: 50, color: Colors.grey)),
+                      ),
+                    ),
+                    SizedBox(width: isDesktop ? 8 : 2),
+                    Expanded(
+                      child:  IconButton(onPressed: () {
+                        setState(() {
+                          imageFile = null; // Clear the picked image
+                        });
+                      }, icon: const Icon(Icons.cancel_outlined))
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: ElevatedButton.icon(
+                icon: Icon(Icons.save,size: isDesktop ? 16 : 12),
+                label: Text('SAVE' , style:  TextStyle(fontSize: isDesktop ? 16 : 12 )),
+                onPressed: saveReport,
                 style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(120, 50),
+                  minimumSize: isDesktop ? const Size(120, 50) : const Size(60, 40),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   elevation: 4,
                 ),
-              )
-            else
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => _pickImage(ImageSource.gallery),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: kIsWeb
-                          ? (base64String != null
-                              ? Image.memory(
-                                  base64Decode(base64String!),
-                                  width: 120,
-                                  height: 50,
-                                  fit: BoxFit.cover,
-                                )
-                              : const Icon(Icons.image,
-                                  size: 50, color: Colors.grey))
-                          : (imageFile != null
-                              ? Image.file(
-                                  File(imageFile!.path),
-                                  width: 120,
-                                  height: 50,
-                                  fit: BoxFit.cover,
-                                )
-                              : const Icon(Icons.image,
-                                  size: 50, color: Colors.grey)),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.cancel),
-                    label: const Text(''),
-                    onPressed: () {
-                      setState(() {
-                        imageFile = null; // Clear the picked image
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(50, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      elevation: 4,
-                    ),
-                  ),
-                ],
-              ),
-            const SizedBox(width: 8),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.save),
-              label: const Text('SAVE'),
-              onPressed: saveReport,
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(120, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                elevation: 4,
               ),
             ),
           ],
@@ -425,7 +421,8 @@ class _ReportScreenState extends State<ReportScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text('Patients Details')),
+        title: Text('Add reports for patient',
+            style: TextStyle(fontSize: isDesktop ? 20 : 16)),
         elevation: 2,
       ),
       body: Padding(

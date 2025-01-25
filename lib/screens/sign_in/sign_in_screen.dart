@@ -9,6 +9,7 @@ import 'package:vatsalya_clinic/utils/gradient_button.dart';
 import 'package:vatsalya_clinic/utils/textfield_builder.dart';
 import 'package:vatsalya_clinic/utils/validation_util.dart';
 
+import '../../main.dart';
 import '../home/home_screen.dart';
 import '../sign_up/sign_up_bloc.dart';
 import '../sign_up/sign_up_screen.dart';
@@ -37,10 +38,10 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: width * 0.25),
+      padding: EdgeInsets.zero,
       child: Scaffold(
         body: Container(
-          color: Colors.white,
+          color: Colors.transparent,
           child: BlocProvider(
             create: (context) => SignInBloc(),
             child: BlocListener<SignInBloc, SignInState>(
@@ -67,63 +68,65 @@ class _SignInScreenState extends State<SignInScreen> {
                   );
                 }
               },
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _signInFormKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Image.asset(
-                          'assets/images/logo.jpeg',
-                          height: 220,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: _signInFormKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: Image.asset(
+                            'assets/images/logo.jpeg',
+                            height: (isTablet || isMobile ? 220 : 80),
+                          ),
                         ),
-                      ),
-                      const Center(child: GradientText('Welcome Back!')),
-                      const SizedBox(height: 16),
-                      const SizedBox(height: 20),
-                      _buildEmailField(context),
-                      const SizedBox(height: 20),
-                      _buildPasswordField(context),
-                      const SizedBox(height: 20),
-                      BlocBuilder<SignInBloc, SignInState>(
-                        builder: (context, state) {
-                          if (state is SignInLoading) {
-                            return const AppLoadingIndicator();
-                          }
-                          return GradientButton(
-                            padding: const EdgeInsets.all(12.0),
-                            text: 'Sign In',
-                            onPressed: () {
-                              if (_signInFormKey.currentState!.validate()) {
-                                BlocProvider.of<SignInBloc>(context).add(
-                                  SignInRequested(
-                                    email: _emailController.text,
-                                    password: _passwordController.text,
-                                  ),
-                                );
-                              }
-                            },
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      TextButton(
-                        child: const Text('New User? Create New Account'),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (newContext) => BlocProvider(
-                                create: (context) => SignUpBloc(),
-                                child: const SignUpScreen(),
+                        const Center(child: GradientText('Welcome Back!')),
+                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
+                        _buildEmailField(context),
+                        const SizedBox(height: 20),
+                        _buildPasswordField(context),
+                        const SizedBox(height:20),
+                        BlocBuilder<SignInBloc, SignInState>(
+                          builder: (context, state) {
+                            if (state is SignInLoading) {
+                              return const AppLoadingIndicator();
+                            }
+                            return GradientButton(
+                              padding: const EdgeInsets.all(12.0),
+                              text: 'Sign In',
+                              onPressed: () {
+                                if (_signInFormKey.currentState!.validate()) {
+                                  BlocProvider.of<SignInBloc>(context).add(
+                                    SignInRequested(
+                                      email: _emailController.text,
+                                      password: _passwordController.text,
+                                    ),
+                                  );
+                                }
+                              },
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        TextButton(
+                          child: const Text('New User? Create New Account'),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (newContext) => BlocProvider(
+                                  create: (context) => SignUpBloc(),
+                                  child: const SignUpScreen(),
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

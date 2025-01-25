@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vatsalya_clinic/main.dart';
 import 'package:vatsalya_clinic/screens/sign_in/sign_in_bloc.dart';
 import 'package:vatsalya_clinic/screens/sign_in/sign_in_screen.dart';
 import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
@@ -48,35 +49,6 @@ class ProfilePage extends StatelessWidget {
                           _buildUserDetailRow('Name: ', userDetails.name),
                           _buildUserDetailRow('Email: ', userDetails.email),
                           _buildUserDetailRow('Role: ', userDetails.role),
-                  /*        const SizedBox(height: 20),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent,
-                              padding:
-                              const EdgeInsets.symmetric(vertical: 12.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (newContext) => BlocProvider(
-                                    create: (context) => SignInBloc(),
-                                    child: const SignInScreen(),
-                                  ),
-                                ),
-                              );
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Sign Out',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),*/
                         ],
                       );
                     },
