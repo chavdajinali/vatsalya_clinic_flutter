@@ -9,7 +9,7 @@ class AddPatientsFirestoreService {
     required String age,
     required String gender,
     required String mobile,
-    required String createdDate,
+    required Timestamp createdDate,
     required String address,
   }) async {
 

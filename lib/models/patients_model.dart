@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class PatientsModel {
   late String id;
   late String name;
   late String mobile;
   late String gender;
-  late String createdDate;
+  late Timestamp createdDate;
   late String age;
   late String address;
   late bool isExpanded;
@@ -43,7 +45,7 @@ class PatientsModel {
           String? name,
           String? mobile,
           String? gender,
-          String? createdDate,
+          Timestamp? createdDate,
           String? age,
           String? address,
           bool? isExpanded}) =>

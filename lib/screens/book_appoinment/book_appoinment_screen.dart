@@ -1,6 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:vatsalya_clinic/models/patients_model.dart';
 import 'package:vatsalya_clinic/screens/book_appoinment/addBookAppoinmentFirestoreService.dart';
 import 'package:vatsalya_clinic/utils/ResponsiveBuilder.dart';
@@ -15,6 +16,9 @@ class BookAppoinmentScreen extends StatefulWidget {
 }
 
 class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
+
+  final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _chiefComplaintController = TextEditingController();
   DateTime? selectedDate;
@@ -90,11 +94,16 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
 
     // Check if all required fields are selected
     if (selectedPatientName != null && selectedDate != null && selectedTime != null) {
-      String? result = await Addbookappoinmentfirestoreservice().addAppoinment(
+
+      // Parse dateController.text to a DateTime object
+      final parsedDate = dateFormatter.parse('${selectedDate!.year}-${selectedDate!.month}-${selectedDate!.day}');
+      final timestamp = Timestamp.fromDate(parsedDate);
+
+      String? result = await AddBookAppointmentFirestoreService().addAppointment(
         patients_name: selecteedPatientsID.toString(),
         reference_by: selectedReference.toString(),
         appoinment_time: selectedTime!.format(context),
-        appoinment_date: '${selectedDate!.year}-${selectedDate!.month}-${selectedDate!.day}',
+        appoinment_date: timestamp,
         chief_complain: _chiefComplaintController.text,
       );
 
@@ -169,7 +178,6 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
                     decoratorProps: DropDownDecoratorProps(
                       decoration: InputDecoration(
                         labelText: 'Select patient Name',
-                        labelStyle: TextStyle(fontSize: inputFontSize),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         fillColor: Colors.grey[200],
                         filled: true,
@@ -227,7 +235,6 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
                       child: InputDecorator(
                         decoration: InputDecoration(
                           labelText: 'Select Time',
-                         // labelStyle: TextStyle(fontSize: inputFontSize),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

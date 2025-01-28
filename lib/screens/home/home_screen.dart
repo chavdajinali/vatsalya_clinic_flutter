@@ -123,11 +123,13 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: isDesktop ? 20 : 14),
             _buildNavItem(Icons.exit_to_app, "Sign Out", 5, navItemFontSize, isSignOut: true),
             SizedBox(height: isDesktop ? 20 : 14),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                "Version 1.0.0 | 2024\nDeveloped by: Jinali Chavda\n(chavdajinali@gmail.com)",
-                style: TextStyle(fontSize: 10),
+            Container(alignment: Alignment.bottomRight,
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  "Version 1.0.0 | 2024\nDeveloped by: Jinali Chavda\n(chavdajinali@gmail.com)",
+                  style: TextStyle(fontSize: 10),
+                ),
               ),
             ),
           ],

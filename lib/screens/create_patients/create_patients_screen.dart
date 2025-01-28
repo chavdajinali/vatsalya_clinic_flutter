@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -188,6 +189,11 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
                     text: 'Add Patient',
                     onPressed: () {
                       if (_createPatientsFormKey.currentState!.validate()) {
+
+                        // Parse dateController.text to a DateTime object
+                        final parsedDate = dateFormatter.parse(dateController.text);
+                        final timestamp = Timestamp.fromDate(parsedDate);
+
                         BlocProvider.of<CreatePatientsBloc>(context).add(
                             CreatePatientsRequested(
                                 name: nameController.text,
@@ -195,7 +201,7 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
                                 gender: gender.toString(),
                                 mobile: mobileController.text,
                                 address: addressController.text,
-                                createdDate: dateController.text));
+                                createdDate: timestamp));
                       }
                     },
                   );

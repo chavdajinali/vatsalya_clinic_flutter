@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
@@ -132,15 +133,15 @@ class HistoryPatientsBloc
 
   Future<void> _filterPatientsByDate(
       FilterPatientsByDate event, Emitter<HistoryPatientsState> emit) async {
-    if (state is HistoryPatientsSuccess) {
-      var successState = state as HistoryPatientsSuccess;
+    if (state is HistoryFilteredSuccess) {
+      var successState = state as HistoryFilteredSuccess;
 
       try {
         // Parse the date strings into DateTime objects
         DateTime startDate = DateTime.parse(event.startDate);
         DateTime endDate = DateTime.parse(event.endDate);
 
-        // Fetch patients from Firestore whose appointments fall within the date range
+        // Fetch patients from Firestore
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
             .collection('patients_tbl')
             .get();
@@ -149,22 +150,28 @@ class HistoryPatientsBloc
 
         for (QueryDocumentSnapshot doc in querySnapshot.docs) {
           var patient = PatientsModel.fromJson(doc.data() as Map<String, dynamic>);
+
+          // Fetch appointments for each patient
           QuerySnapshot appointmentSnapshot = await FirebaseFirestore.instance
               .collection('appointment_tbl')
               .where('patients_name', isEqualTo: patient.id)
-              .where('appointment_date',
-              isGreaterThanOrEqualTo: event.startDate)
-              .where('appointment_date', isLessThanOrEqualTo: event.endDate)
+              .where('appointment_date', isGreaterThanOrEqualTo: startDate)
+              .where('appointment_date', isLessThanOrEqualTo: endDate)
               .get();
 
           if (appointmentSnapshot.docs.isNotEmpty) {
             filteredPatients.add(patient);
           }
+          if (kDebugMode) {
+            print(startDate);
+            print(endDate);
+            print(appointmentSnapshot);
+          }
         }
 
-        emit(successState.copyWith(patientList: filteredPatients));
+        emit(HistoryFilteredSuccess(filteredPatientList: filteredPatients));
       } catch (e) {
-        emit(HistoryPatientsFailure(error: e.toString()));
+        emit(HistoryFilteredpatientsFailure(error: e.toString()));
       }
     }
   }

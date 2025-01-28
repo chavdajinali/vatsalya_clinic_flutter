@@ -13,7 +13,7 @@ class AppLabelValue extends StatelessWidget {
         Text(
           "$label: ",
         ),
-        Text(value, style: const TextStyle(color: Colors.grey)),
+        Expanded(child: Text(value, style: const TextStyle(color: Colors.grey))),
       ],
     );
   }

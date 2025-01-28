@@ -48,15 +48,23 @@ Future<List<AppointmentModel>> getAppoinmentFromFirestore() async {
   // Query the collection for all documents
   QuerySnapshot querySnapshot = await appointmentTbl.get();
   final currentDate = DateTime.now();
-  final formattedCurrentDate =
-      '${currentDate.year}-${currentDate.month}-${currentDate.day}';
-  // Iterate through the documents and extract the 'name' field
+
+  // Iterate through the documents and extract the 'appointmentDate' field
   for (QueryDocumentSnapshot doc in querySnapshot.docs) {
     AppointmentModel data =
-        AppointmentModel.fromJson(doc.data() as Map<String, dynamic>);
+    AppointmentModel.fromJson(doc.data() as Map<String, dynamic>);
 
-    if (data.appointmentDate == formattedCurrentDate) {
-      appointmentList.add(data);
+    // Check if the appointmentDate matches the current date
+    if (data.appointmentDate != null) {
+      // Convert the appointmentDate (Timestamp) to DateTime
+      DateTime appointmentDate = data.appointmentDate;
+
+      // Compare year, month, and day
+      if (appointmentDate.year == currentDate.year &&
+          appointmentDate.month == currentDate.month &&
+          appointmentDate.day == currentDate.day) {
+        appointmentList.add(data);
+      }
     }
   }
 

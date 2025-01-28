@@ -90,9 +90,7 @@ class ReferenceAddList extends StatelessWidget {
                                   color: Colors.white,
                                   child: Padding(
                                       padding: const EdgeInsets.all(16.0),
-                                      child: AppLabelValue(
-                                          label: "name",
-                                          value: reference.name)));
+                                      child: Text(reference.name)));
                             }),
                       )
                 : const Center(child: CircularProgressIndicator());

@@ -1,5 +1,6 @@
 // sign_in_event.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class CreatePatientsEvent extends Equatable {
@@ -13,7 +14,7 @@ class CreatePatientsRequested extends CreatePatientsEvent {
   final String gender;
   final String mobile;
   final String address;
-  final String createdDate;
+  final Timestamp createdDate;
 
   CreatePatientsRequested({required this.name, required this.age, required this.gender, required this.mobile, required this.address,required this.createdDate});
 

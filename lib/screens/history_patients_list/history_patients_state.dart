@@ -52,6 +52,26 @@ class HistoryPatientsSuccess extends HistoryPatientsState {
       ];
 }
 
+class HistoryFilteredSuccess extends HistoryPatientsState {
+  final List<PatientsModel> filteredPatientList;
+
+  HistoryFilteredSuccess({required this.filteredPatientList});
+
+  HistoryFilteredSuccess copyWith({List<PatientsModel>? filteredPatientList}) => HistoryFilteredSuccess(filteredPatientList: filteredPatientList ?? this.filteredPatientList);
+
+  @override
+  List<Object?> get props => [filteredPatientList];
+}
+
+class HistoryFilteredpatientsFailure extends HistoryPatientsState {
+  final String error;
+
+  HistoryFilteredpatientsFailure({required this.error});
+
+  @override
+  List<Object?> get props => [error];
+}
+
 class HistoryPatientsFailure extends HistoryPatientsState {
   final String error;
 

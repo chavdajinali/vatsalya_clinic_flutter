@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/screens/book_appoinment/book_appoinment_screen.dart';
 import 'package:vatsalya_clinic/screens/report/reportscreen.dart';
@@ -157,6 +158,14 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
     Color paymentButtonColor = appointment.isPayment ? Colors.green : Colors.red;
     String paymentButtonText = appointment.isPayment ? "Paid" : "Payment";
 
+    // Convert the Timestamp to DateTime
+    DateTime dateTime = appointment.appointmentDate;
+
+    // Format the DateTime into a readable date and time string
+    String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime); // e.g., 2025-01-27
+    String formattedTime = DateFormat('hh:mm a').format(dateTime);   // e.g., 02:30 PM
+
+
     return Card(
       color: Colors.white,
       child: Padding(
@@ -173,7 +182,7 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                       Text('Name: ${appointment.patientName}', style: TextStyle(fontSize: isDesktop ? fontSize : 14,fontWeight: FontWeight.bold)),
                       SizedBox(height: isDesktop ? 8 : 10),
                       Text(
-                        'Date: ${appointment.appointmentDate} ${appointment.appointmentTime}',
+                        'Date: $formattedDate $formattedTime',//${appointment.appointmentDate} ${appointment.appointmentTime}',
                         style: TextStyle(color: Colors.black54, fontSize: fontSize),
                       ),
                     ],
