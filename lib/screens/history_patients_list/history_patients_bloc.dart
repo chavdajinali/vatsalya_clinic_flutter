@@ -1,17 +1,15 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/models/report_model.dart';
-import 'package:vatsalya_clinic/screens/create_patients/create_patients_state.dart';
 import '../../models/patients_model.dart';
 import 'history_patients_event.dart';
 import 'history_patients_state.dart';
 
 class HistoryPatientsBloc
     extends Bloc<HistoryPatientsEvent, HistoryPatientsState> {
-  HistoryPatientsBloc() : super(HistoryPatientsInitial()) {
+  HistoryPatientsBloc() : super(const HistoryPatientsInitial()) {
     on<GetPatientList>(_getPatientList);
     on<ExpandCollapsePatientItem>(_manageExpandCollapse);
     on<GetPatientHistory>(_getPatientHistory);

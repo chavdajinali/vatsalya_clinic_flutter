@@ -199,7 +199,7 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
                             ),
                             const Icon(
                               Icons.date_range,
-                              color: Colors.blue,
+                              color: Colors.black54,
                             ),
                           ],
                         ),
