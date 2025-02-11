@@ -2,9 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/models/patients_model.dart';
 import 'package:vatsalya_clinic/screens/book_appoinment/addBookAppoinmentFirestoreService.dart';
 import 'package:vatsalya_clinic/utils/ResponsiveBuilder.dart';
+import 'package:vatsalya_clinic/utils/app_utils.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
 import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
 
@@ -16,53 +18,50 @@ class BookAppoinmentScreen extends StatefulWidget {
 }
 
 class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
-
   final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
 
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _chiefComplaintController = TextEditingController();
+  final TextEditingController _chiefComplaintController =
+      TextEditingController();
   DateTime? selectedDate;
+  String? selectedDateString;
   TimeOfDay? selectedTime;
   String? selectedReference;
   List<String> referenceOptions = [];
   List<PatientsModel> patientsList = [];
   List<String> patientsNameOptions = [];
-  String? selectedPatientName;
+  PatientsModel? selectedPatient;
   String? selecteedPatientsID;
   final dropDownKey = GlobalKey<DropdownSearchState>();
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+  Future<void> _selectDateTime(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(), // Restrict to current date or later
       lastDate: DateTime(2100),
     );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
-  }
 
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay currentTime = TimeOfDay.now();
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: currentTime,
-    );
-    if (picked != null) {
-      // Compare selected time with current time
-      if (picked.hour < currentTime.hour ||
-          (picked.hour == currentTime.hour && picked.minute < currentTime.minute)) {
-        // If the selected time is before the current time, show an error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('You cannot select a time before the current time')),
-        );
-      } else {
+    if (pickedDate != null) {
+      TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+
+      if (pickedTime != null) {
         setState(() {
-          selectedTime = picked;
+          selectedDate = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+          selectedDateString =
+              DateFormat("dd/MM/yyyy hh:mm a").format(selectedDate!);
         });
+
+        print("Selected DateTime: $selectedDate");
       }
     }
   }
@@ -76,66 +75,33 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
 
   Future<void> _loadPatientsOptions() async {
     patientsList = await getNamesOfPatientsFromFirestore();
-    setState(() {
-      for (int i = 0; i < patientsList.length; i++) {
-        patientsNameOptions.add(patientsList[i].name);
-      }
-    });
+    setState(() {});
   }
 
-  Future<void> _loadBookAppoinment() async {
-    // Find the selected patient's ID
-    for (int i = 0; i < patientsList.length; i++) {
-      if (selectedPatientName == patientsList[i].name) {
-        selecteedPatientsID = patientsList[i].id;
-        break; // Exit the loop once the match is found
-      }
-    }
-
+  Future<void> bookAppointment() async {
     // Check if all required fields are selected
-    if (selectedPatientName != null && selectedDate != null && selectedTime != null) {
-
-      // Parse dateController.text to a DateTime object
-      final parsedDate = dateFormatter.parse('${selectedDate!.year}-${selectedDate!.month}-${selectedDate!.day}');
-      final timestamp = Timestamp.fromDate(parsedDate);
-
-      String? result = await AddBookAppointmentFirestoreService().addAppointment(
-        patients_name: selecteedPatientsID.toString(),
-        reference_by: selectedReference.toString(),
-        appoinment_time: selectedTime!.format(context),
-        appoinment_date: timestamp,
-        chief_complain: _chiefComplaintController.text,
-      );
-
-      // Show SnackBar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result ?? "Something went wrong!"),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+    if (selectedPatient != null && selectedDate != null) {
+      String? result = await AddBookAppointmentFirestoreService()
+          .addAppointment(AppointmentModel(
+              id: "",
+              patientName: selectedPatient!.name,
+              patientId: selectedPatient!.id,
+              timestamp: Timestamp.fromDate(selectedDate!),
+              dateTime: selectedDateString!,
+              appointmentReferenceBy: selectedReference,
+              appointmentChiefComplain: _chiefComplaintController.text,
+              isPayment: false,
+              paymentAmount: "0",
+              paymentType: "",
+              reports: []));
 
       // Clear fields if the booking was successful
-      if (result == "Appointment added successfully!") {
-        setState(() {
-          _chiefComplaintController.clear();
-          selectedPatientName = null;
-          selecteedPatientsID = null;
-          selectedDate = null;
-          selectedTime = null;
-          selectedReference = null;
-          dropDownKey.currentState?.changeSelectedItem(null); // Clear DropdownSearch
-        });
+      if (result == "success") {
         Navigator.pop(context);
       }
+      showSnackBar(result, context);
     } else {
-      // Show a warning if not all fields are selected
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please select all required fields"),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      showSnackBar("Please select all required fields.", context);
     }
   }
 
@@ -144,6 +110,13 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
     super.initState();
     _loadReferenceNames();
     _loadPatientsOptions();
+  }
+
+  @override
+  void dispose() {
+    _chiefComplaintController.dispose();
+    _nameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -156,8 +129,10 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
         double inputFontSize = getFontSize(sizingInfo, 14, 12, 10);
 
         return Scaffold(
+          backgroundColor: Colors.white,
           appBar: AppBar(
-            title: const Text('Book Appointment'/*, style: TextStyle(fontSize: fontSize)*/),
+            title: const Text(
+                'Book Appointment' /*, style: TextStyle(fontSize: fontSize)*/),
             backgroundColor: Colors.transparent,
           ),
           body: SingleChildScrollView(
@@ -167,18 +142,23 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Name TextField with Search Icon
-                  DropdownSearch<String>(
+                  DropdownSearch<PatientsModel>(
                     key: dropDownKey,
-                    items: (filter, infiniteScrollProps) => patientsNameOptions,
+                    items: (filter, infiniteScrollProps) => patientsList,
                     onChanged: (value) {
                       setState(() {
-                        selectedPatientName = value;
+                        selectedPatient = value;
                       });
                     },
+                    compareFn: (item1, item2) => item1.id == item2.id,
+                    itemAsString: (patient) => patient.name,
                     decoratorProps: DropDownDecoratorProps(
                       decoration: InputDecoration(
-                        labelText: 'Select patient Name',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        labelText: selectedPatient == null
+                            ? "Select Patient name"
+                            : 'Patient Name',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)),
                         fillColor: Colors.grey[200],
                         filled: true,
                       ),
@@ -189,10 +169,10 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-            
+
                   // Date Picker
                   InkWell(
-                    onTap: () => _selectDate(context),
+                    onTap: () => _selectDateTime(context),
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
@@ -200,7 +180,8 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
                       ),
                       child: InputDecorator(
                         decoration: InputDecoration(
-                          labelText: 'Select Date',
+                          labelText:
+                              selectedDateString == null ? null : 'Date & Time',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -211,84 +192,54 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              selectedDate != null
-                                  ? '${selectedDate!.year}-${selectedDate!.month}-${selectedDate!.day}'
-                                  : 'Choose Date',
-                              style: const TextStyle(/*fontSize: inputFontSize,*/ color: Colors.black87),
+                              selectedDateString ?? "Select Date & Time",
+                              style: const TextStyle(
+                                  /*fontSize: inputFontSize,*/
+                                  color: Colors.black87),
                             ),
-                            const Icon(Icons.calendar_today),
+                            const Icon(
+                              Icons.date_range,
+                              color: Colors.blue,
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
-            
-                  // Time Picker
-                  InkWell(
-                    onTap: () => _selectTime(context),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: InputDecorator(
-                        decoration: InputDecoration(
-                          labelText: 'Select Time',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          fillColor: Colors.grey[200],
-                          filled: true,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              selectedTime != null
-                                  ? selectedTime!.format(context)
-                                  : 'Choose Time',
-                              style: const TextStyle(/*fontSize: inputFontSize,*/ color: Colors.black87),
-                            ),
-                            const Icon(Icons.access_time),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-            
+
                   // Reference By Dropdown
                   Padding(
                     padding: const EdgeInsets.all(2.0),
                     child: referenceOptions.isEmpty
                         ? const Center(child: CircularProgressIndicator())
                         : DropdownButtonFormField<String>(
-                      value: selectedReference,
-                      items: referenceOptions.map((String option) {
-                        return DropdownMenuItem<String>(
-                          value: option,
-                          child: Text(option, style: TextStyle (fontSize: inputFontSize)),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedReference = newValue;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Reference By',
-                        //labelStyle: TextStyle(fontSize: inputFontSize),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        fillColor: Colors.grey[200],
-                        filled: true,
-                      ),
-                    ),
+                            value: selectedReference,
+                            items: referenceOptions.map((String option) {
+                              return DropdownMenuItem<String>(
+                                value: option,
+                                child: Text(option,
+                                    style: TextStyle(fontSize: inputFontSize)),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedReference = newValue;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Reference By',
+                              //labelStyle: TextStyle(fontSize: inputFontSize),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              fillColor: Colors.grey[200],
+                              filled: true,
+                            ),
+                          ),
                   ),
                   const SizedBox(height: 16),
-            
+
                   // Chief Complaint TextField
                   TextFormField(
                     controller: _chiefComplaintController,
@@ -304,7 +255,7 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-            
+
                   // Submit Button
                   Center(
                     child: GradientButton(
@@ -312,7 +263,7 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
                       text: 'Book Appointment',
                       fontsize: buttonFontSize,
                       onPressed: () {
-                        _loadBookAppoinment();
+                        bookAppointment();
                       },
                     ),
                   ),
@@ -326,7 +277,8 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
   }
 
   /// A utility function to get adaptive font size based on the device screen type.
-  double getFontSize(SizingInformation sizingInfo, double desktopSize, double tabletSize, double mobileSize) {
+  double getFontSize(SizingInformation sizingInfo, double desktopSize,
+      double tabletSize, double mobileSize) {
     switch (sizingInfo.deviceScreenType) {
       case DeviceScreenType.Desktop:
         return desktopSize;
@@ -337,5 +289,4 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
         return mobileSize;
     }
   }
-
 }

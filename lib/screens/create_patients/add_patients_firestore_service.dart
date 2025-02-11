@@ -23,7 +23,7 @@ class AddPatientsFirestoreService {
           age: age,
           gender: gender,
           mobile: mobile,
-          createdDate: createdDate,
+          createdDate: createdDate,appointments: [],
           isExpanded: false);
 
       refId.set(newPatients.toJson());

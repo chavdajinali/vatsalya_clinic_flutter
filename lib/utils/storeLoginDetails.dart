@@ -41,31 +41,20 @@ Future<List<String>> getNamesFromFirestore() async {
 Future<List<AppointmentModel>> getAppoinmentFromFirestore() async {
   List<AppointmentModel> appointmentList = [];
 
-  // Get a reference to the Firestore collection
-  final CollectionReference appointmentTbl =
-      FirebaseFirestore.instance.collection('appointment_tbl');
-
   // Query the collection for all documents
-  QuerySnapshot querySnapshot = await appointmentTbl.get();
-  final currentDate = DateTime.now();
+  QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+      .collection('appointment_tbl')
+      .where("timestamp",
+          isGreaterThan: Timestamp.fromDate(
+              DateTime.now().subtract(const Duration(days: 1))))
+      .where("timestamp",
+          isLessThanOrEqualTo: Timestamp.fromDate(DateTime.now()))
+      .get();
 
   // Iterate through the documents and extract the 'appointmentDate' field
   for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-    AppointmentModel data =
-    AppointmentModel.fromJson(doc.data() as Map<String, dynamic>);
-
-    // Check if the appointmentDate matches the current date
-    if (data.appointmentDate != null) {
-      // Convert the appointmentDate (Timestamp) to DateTime
-      DateTime appointmentDate = data.appointmentDate;
-
-      // Compare year, month, and day
-      if (appointmentDate.year == currentDate.year &&
-          appointmentDate.month == currentDate.month &&
-          appointmentDate.day == currentDate.day) {
-        appointmentList.add(data);
-      }
-    }
+    appointmentList
+        .add(AppointmentModel.fromJson(doc.data() as Map<String, dynamic>));
   }
 
   return appointmentList;

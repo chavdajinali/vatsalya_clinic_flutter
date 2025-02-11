@@ -18,8 +18,8 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     try {
       // Fetch today's appointments from Firestore
       final querySnapshot = await FirebaseFirestore.instance
-          .collection('appointments')
-          .where('date', isEqualTo: DateTime.now().toString())
+          .collection('appointment_tbl')
+          .where('appoinment_date', isEqualTo: Timestamp.fromDate(DateTime.now()))
           .get();
 
       // Convert the fetched appointments into a list

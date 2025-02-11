@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/models/report_model.dart';
 import 'package:vatsalya_clinic/screens/create_patients/create_patients_state.dart';
-
 import '../../models/patients_model.dart';
 import 'history_patients_event.dart';
 import 'history_patients_state.dart';
@@ -12,60 +12,64 @@ import 'history_patients_state.dart';
 class HistoryPatientsBloc
     extends Bloc<HistoryPatientsEvent, HistoryPatientsState> {
   HistoryPatientsBloc() : super(HistoryPatientsInitial()) {
-    // Register the event handler for SignInRequested
     on<GetPatientList>(_getPatientList);
     on<ExpandCollapsePatientItem>(_manageExpandCollapse);
     on<GetPatientHistory>(_getPatientHistory);
     on<SelectAppointment>(_selectAppointment);
-    on<FilterPatientsByDate>(_filterPatientsByDate);
   }
 
-  Future _selectAppointment(
+  Future<void> _selectAppointment(
       SelectAppointment event, Emitter<HistoryPatientsState> emit) async {
-    QuerySnapshot result = await FirebaseFirestore.instance
-        .collection('report_tbl')
-        .where('patientID', isEqualTo: event.selectedAppointment.patientName)
-        .where('reportDate',
-            isEqualTo: event.selectedAppointment.appointmentDate)
-        .get();
-    List<ReportModel> reports = [];
-    for (QueryDocumentSnapshot doc in result.docs) {
-      reports.add(ReportModel.fromJson(doc.data()
-          as Map<String, dynamic>)); // Assuming 'name' is the field for names
-    }
+    try {
+      QuerySnapshot result = await FirebaseFirestore.instance
+          .collection('report_tbl')
+          .where('patientID', isEqualTo: event.selectedAppointment.patientId)
+          .where('reportDate', isEqualTo: event.selectedAppointment.timestamp)
+          .get();
 
-    // if (state is HistoryPatientsSuccess) {
-    emit((state as HistoryPatientsSuccess).copyWith(
-        selectedAppointment:
-            event.selectedAppointment.copyWith(reports: reports)));
-    // }
+      List<ReportModel> reports = result.docs
+          .map(
+              (doc) => ReportModel.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      emit((state as HistoryPatientsSuccess).copyWith(
+          selectedAppointment:
+              event.selectedAppointment.copyWith(reports: reports)));
+    } catch (error) {
+      if (kDebugMode) print("Error fetching reports: $error");
+    }
   }
 
-// This method handles the SignInRequested event
-  Future _getPatientList(
+  Future<void> _getPatientList(
       GetPatientList event, Emitter<HistoryPatientsState> emit) async {
-    emit(HistoryPatientsLoading());
-
-    List<PatientsModel> patientsModelList = [];
+    emit(const HistoryPatientsLoading());
 
     try {
-      // Query the collection for all documents
       QuerySnapshot querySnapshot =
           await FirebaseFirestore.instance.collection('patients_tbl').get();
-      // Iterate through the documents and extract the 'name' field
-      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-        var patient =
-            PatientsModel.fromJson(doc.data() as Map<String, dynamic>);
-        patient.id = doc.id;
-        patientsModelList
-            .add(patient); // Assuming 'name' is the field for names
-      }
+
+      List<PatientsModel> patientsModelList = querySnapshot.docs
+          .map((doc) =>
+              PatientsModel.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+
       emit(HistoryPatientsSuccess(
-          patientList: patientsModelList,
-          patientHistory: [],
-          isPatientHistoryLoading: false,
-          errorMessage: "",
-          selectedAppointment: AppointmentModel.fromJson({})));
+        patientList: patientsModelList,
+        patientHistory: const [],
+        isPatientHistoryLoading: false,
+        errorMessage: "",
+        isFilterPatientListState: false,
+        selectedAppointment: AppointmentModel.fromJson({}),
+      ));
+
+      final today = DateTime.now().copyWith(
+          hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
+
+      add(GetPatientHistory(
+          startDate: today.subtract(Duration(days: today.day)),
+          endDate: today
+              .add(const Duration(days: 1))
+              .subtract(const Duration(seconds: 1))));
     } catch (e) {
       emit(HistoryPatientsFailure(error: e.toString()));
     }
@@ -74,27 +78,19 @@ class HistoryPatientsBloc
   Future<void> _manageExpandCollapse(ExpandCollapsePatientItem event,
       Emitter<HistoryPatientsState> emit) async {
     if (state is HistoryPatientsSuccess) {
-      // Clone the patient list to ensure immutability
       var patientList = List<PatientsModel>.from(
           (state as HistoryPatientsSuccess).patientList);
 
       for (int i = 0; i < patientList.length; i++) {
         if (i == event.index) {
           patientList[i] = patientList[i].copyWith(
-            isExpanded:
-                !patientList[i].isExpanded, // Update only the selected item
+            isExpanded: !patientList[i].isExpanded,
           );
-          if (patientList[i].isExpanded) {
-            add(GetPatientHistory(patientList[i].id));
-          }
         } else {
-          patientList[i] = patientList[i].copyWith(
-            isExpanded: false, // Update only the selected item
-          );
+          patientList[i] = patientList[i].copyWith(isExpanded: false);
         }
       }
 
-      // Emit a new instance of the state with the updated list
       emit(
           (state as HistoryPatientsSuccess).copyWith(patientList: patientList));
     }
@@ -105,75 +101,28 @@ class HistoryPatientsBloc
     emit((state as HistoryPatientsSuccess)
         .copyWith(isPatientHistoryLoading: true));
 
-    // Fetch the user from Firestore
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('appointment_tbl')
-        .where('patients_name', isEqualTo: event.patientId)
-        .get();
-
-    if (snapshot.docs.isEmpty) {
-      emit((state as HistoryPatientsSuccess).copyWith(
-          isPatientHistoryLoading: false,
-          errorMessage: "No history found.",
-          selectedAppointment: AppointmentModel.fromJson({}),
-          patientHistory: []));
-    } else {
-      List<AppointmentModel> appointments = [];
-      for (QueryDocumentSnapshot doc in snapshot.docs) {
-        appointments.add(AppointmentModel.fromJson(doc.data()
-            as Map<String, dynamic>)); // Assuming 'name' is the field for names
-      }
-      emit((state as HistoryPatientsSuccess).copyWith(
-          isPatientHistoryLoading: false,
-          errorMessage: "",
-          selectedAppointment: AppointmentModel.fromJson({}),
-          patientHistory: appointments));
-    }
-  }
-
-  Future<void> _filterPatientsByDate(
-      FilterPatientsByDate event, Emitter<HistoryPatientsState> emit) async {
-    if (state is HistoryFilteredSuccess) {
-      var successState = state as HistoryFilteredSuccess;
-
-      try {
-        // Parse the date strings into DateTime objects
-        DateTime startDate = DateTime.parse(event.startDate);
-        DateTime endDate = DateTime.parse(event.endDate);
-
-        // Fetch patients from Firestore
-        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-            .collection('patients_tbl')
+    try {
+      List<PatientsModel> patients = [];
+      for (var patient in (state as HistoryPatientsSuccess).patientList) {
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection('appointment_tbl')
+            .where('patient_id', isEqualTo: patient.id)
+            .where('timestamp',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(event.startDate))
+            .where('timestamp',
+                isLessThanOrEqualTo: Timestamp.fromDate(event.endDate))
             .get();
 
-        List<PatientsModel> filteredPatients = [];
-
-        for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-          var patient = PatientsModel.fromJson(doc.data() as Map<String, dynamic>);
-
-          // Fetch appointments for each patient
-          QuerySnapshot appointmentSnapshot = await FirebaseFirestore.instance
-              .collection('appointment_tbl')
-              .where('patients_name', isEqualTo: patient.id)
-              .where('appointment_date', isGreaterThanOrEqualTo: startDate)
-              .where('appointment_date', isLessThanOrEqualTo: endDate)
-              .get();
-
-          if (appointmentSnapshot.docs.isNotEmpty) {
-            filteredPatients.add(patient);
-          }
-          if (kDebugMode) {
-            print(startDate);
-            print(endDate);
-            print(appointmentSnapshot);
-          }
-        }
-
-        emit(HistoryFilteredSuccess(filteredPatientList: filteredPatients));
-      } catch (e) {
-        emit(HistoryFilteredpatientsFailure(error: e.toString()));
+        List<AppointmentModel> appointments = snapshot.docs
+            .map((doc) => AppointmentModel.fromJson(
+                doc.data() as Map<String, dynamic>, doc.id))
+            .toList();
+        patients.add(patient.copyWith(appointments: appointments));
       }
+
+      emit((state as HistoryPatientsSuccess).copyWith(patientList: patients));
+    } catch (e) {
+      emit((state as HistoryPatientsFailure).copyWith(erorr: e.toString()));
     }
   }
-
 }

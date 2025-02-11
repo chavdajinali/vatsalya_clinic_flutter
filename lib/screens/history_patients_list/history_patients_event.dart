@@ -17,9 +17,10 @@ class ExpandCollapsePatientItem extends HistoryPatientsEvent {
 }
 
 class GetPatientHistory extends HistoryPatientsEvent {
-  final String patientId;
+  final DateTime startDate;
+  final DateTime endDate;
 
-  GetPatientHistory(this.patientId);
+  GetPatientHistory({required this.startDate,required this.endDate});
 }
 
 class SelectAppointment extends HistoryPatientsEvent {
@@ -27,7 +28,6 @@ class SelectAppointment extends HistoryPatientsEvent {
 
   SelectAppointment(this.selectedAppointment);
 }
-
 
 class FilterPatientsByDate extends HistoryPatientsEvent {
   final String startDate;

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:vatsalya_clinic/models/appointment_model.dart';
 
 class PatientsModel {
   late String id;
@@ -9,6 +10,7 @@ class PatientsModel {
   late String age;
   late String address;
   late bool isExpanded;
+  late List<AppointmentModel> appointments;
 
   PatientsModel(
       {required this.id,
@@ -18,6 +20,7 @@ class PatientsModel {
       required this.createdDate,
       required this.age,
       required this.isExpanded,
+      required this.appointments,
       required this.address});
 
   factory PatientsModel.fromJson(Map<String, dynamic> json) => PatientsModel(
@@ -28,6 +31,7 @@ class PatientsModel {
       createdDate: json['createdDate'] ?? "",
       age: json['age'] ?? "",
       address: json['address'] ?? "",
+      appointments: [],
       isExpanded: false);
 
   Map<String, dynamic> toJson() => {
@@ -47,6 +51,7 @@ class PatientsModel {
           String? gender,
           Timestamp? createdDate,
           String? age,
+          List<AppointmentModel>? appointments,
           String? address,
           bool? isExpanded}) =>
       PatientsModel(
@@ -57,5 +62,6 @@ class PatientsModel {
           createdDate: createdDate ?? this.createdDate,
           age: age ?? this.age,
           isExpanded: isExpanded ?? this.isExpanded,
+          appointments: appointments ?? this.appointments,
           address: address ?? this.address);
 }
