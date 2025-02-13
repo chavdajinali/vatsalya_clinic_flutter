@@ -11,6 +11,7 @@ class PatientsModel {
   late String address;
   late bool isExpanded;
   late List<AppointmentModel> appointments;
+  late double totalPayment;
 
   PatientsModel(
       {required this.id,
@@ -21,7 +22,8 @@ class PatientsModel {
       required this.age,
       required this.isExpanded,
       required this.appointments,
-      required this.address});
+      required this.address,
+      required this.totalPayment});
 
   factory PatientsModel.fromJson(Map<String, dynamic> json) => PatientsModel(
       id: json['id'] ?? "",
@@ -32,7 +34,8 @@ class PatientsModel {
       age: json['age'] ?? "",
       address: json['address'] ?? "",
       appointments: [],
-      isExpanded: false);
+      isExpanded: false,
+      totalPayment: 0.0);
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -41,7 +44,8 @@ class PatientsModel {
         'gender': gender,
         'createdDate': createdDate,
         'age': age,
-        'address': address
+        'address': address,
+        // 'total_payment': totalPayment,
       };
 
   PatientsModel copyWith(
@@ -53,7 +57,8 @@ class PatientsModel {
           String? age,
           List<AppointmentModel>? appointments,
           String? address,
-          bool? isExpanded}) =>
+          bool? isExpanded,
+          double? totalPayment}) =>
       PatientsModel(
           id: id ?? this.id,
           name: name ?? this.name,
@@ -63,5 +68,6 @@ class PatientsModel {
           age: age ?? this.age,
           isExpanded: isExpanded ?? this.isExpanded,
           appointments: appointments ?? this.appointments,
-          address: address ?? this.address);
+          address: address ?? this.address,
+          totalPayment: totalPayment ?? this.totalPayment);
 }

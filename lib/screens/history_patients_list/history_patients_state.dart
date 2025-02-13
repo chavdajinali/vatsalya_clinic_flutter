@@ -24,6 +24,7 @@ class HistoryPatientsSuccess extends HistoryPatientsState {
   final String errorMessage;
   final AppointmentModel selectedAppointment;
   final bool isFilterPatientListState;
+  final double totalPaymentAmount;
 
   const HistoryPatientsSuccess({
     required this.patientList,
@@ -32,6 +33,7 @@ class HistoryPatientsSuccess extends HistoryPatientsState {
     required this.selectedAppointment,
     required this.isPatientHistoryLoading,
     required this.isFilterPatientListState,
+    required this.totalPaymentAmount
   });
 
   HistoryPatientsSuccess copyWith({
@@ -41,6 +43,7 @@ class HistoryPatientsSuccess extends HistoryPatientsState {
     AppointmentModel? selectedAppointment,
     bool? isPatientHistoryLoading,
     bool? isFilterPatientListState,
+    double? totalPaymentAmount
   }) {
     return HistoryPatientsSuccess(
       patientList: patientList ?? this.patientList,
@@ -51,6 +54,7 @@ class HistoryPatientsSuccess extends HistoryPatientsState {
       isPatientHistoryLoading ?? this.isPatientHistoryLoading,
       isFilterPatientListState:
       isFilterPatientListState ?? this.isFilterPatientListState,
+      totalPaymentAmount: totalPaymentAmount ?? this.totalPaymentAmount
     );
   }
 
@@ -62,6 +66,7 @@ class HistoryPatientsSuccess extends HistoryPatientsState {
     errorMessage,
     selectedAppointment,
     isFilterPatientListState,
+    totalPaymentAmount
   ];
 }
 

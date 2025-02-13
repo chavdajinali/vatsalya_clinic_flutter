@@ -41,7 +41,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Container(
         color: Colors.transparent,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: width * 0.25),
+          padding: EdgeInsets.zero,//EdgeInsets.symmetric(horizontal: width * 0.25),
           child: Scaffold(
             backgroundColor: Colors.white,
             body: BlocListener<SignUpBloc, SignUpState>(

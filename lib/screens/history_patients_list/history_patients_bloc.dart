@@ -57,6 +57,7 @@ class HistoryPatientsBloc
         isPatientHistoryLoading: false,
         errorMessage: "",
         isFilterPatientListState: false,
+        totalPaymentAmount: 0.0,
         selectedAppointment: AppointmentModel.fromJson({}),
       ));
 
@@ -88,7 +89,6 @@ class HistoryPatientsBloc
           patientList[i] = patientList[i].copyWith(isExpanded: false);
         }
       }
-
       emit(
           (state as HistoryPatientsSuccess).copyWith(patientList: patientList));
     }
@@ -98,7 +98,7 @@ class HistoryPatientsBloc
       GetPatientHistory event, Emitter<HistoryPatientsState> emit) async {
     emit((state as HistoryPatientsSuccess)
         .copyWith(isPatientHistoryLoading: true));
-
+    double mainTotalPayment = 0.0;
     try {
       List<PatientsModel> patients = [];
       for (var patient in (state as HistoryPatientsSuccess).patientList) {
@@ -115,10 +115,19 @@ class HistoryPatientsBloc
             .map((doc) => AppointmentModel.fromJson(
                 doc.data() as Map<String, dynamic>, doc.id))
             .toList();
-        patients.add(patient.copyWith(appointments: appointments));
+
+        double totalpaymentAmount = 0.0;
+        for (int i = 0; i < appointments.length; i++) {
+          if (appointments[i].isPayment) {
+            mainTotalPayment +=  double.parse(appointments[i].paymentAmount);
+            totalpaymentAmount += double.parse(appointments[i].paymentAmount);
+          }
+        }
+
+        patients.add(patient.copyWith(appointments: appointments,totalPayment: totalpaymentAmount));
       }
 
-      emit((state as HistoryPatientsSuccess).copyWith(patientList: patients));
+      emit((state as HistoryPatientsSuccess).copyWith(patientList: patients,totalPaymentAmount: mainTotalPayment));
     } catch (e) {
       emit((state as HistoryPatientsFailure).copyWith(erorr: e.toString()));
     }
