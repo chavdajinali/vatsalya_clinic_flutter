@@ -11,12 +11,11 @@ class Reportfirestoreservice {
       {required String patients_id,
       required String report_name,
       required String report_image,
-      required String report_date,
+      required Timestamp report_date,
       required String report_image_name}) async {
     if (patients_id.isEmpty ||
         report_name.isEmpty ||
         report_image.isEmpty ||
-        report_date.isEmpty ||
         report_image_name.isEmpty) {
       return 'Error: All fields must be provided.';
     }

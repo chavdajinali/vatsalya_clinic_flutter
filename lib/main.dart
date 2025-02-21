@@ -73,7 +73,7 @@ class _MyAppState extends State<MyApp> {
       lazy: false,
       child: MaterialApp(
         title: "Vatsalya clinic",debugShowCheckedModeBanner: false,
-        home: (widget.loginDetails.email.isEmpty)
+        home: (widget.loginDetails.email.isNotEmpty)
             ? const HomeScreen()
             : const SignInScreen(),
       ),

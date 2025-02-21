@@ -12,3 +12,8 @@ showSnackBar(String message, BuildContext context) {
     print("##MS- $message");
   }
 }
+
+DateTime prepareEndDate(DateTime dateTime) {
+  return dateTime.copyWith(
+      hour: 23, minute: 59, second: 59, millisecond: 0, microsecond: 0);
+}

@@ -82,7 +82,7 @@ class _ReportScreenState extends State<ReportScreen> {
     try {
       final docSnapshot = await FirebaseFirestore.instance
           .collection('patients_tbl')
-          .doc(widget.appointment.patientName)
+          .doc(widget.appointment.patientId)
           .get();
 
       if (docSnapshot.exists) {
@@ -190,11 +190,11 @@ class _ReportScreenState extends State<ReportScreen> {
         }
 
         var result = await Reportfirestoreservice().addReport(
-          patients_id: widget.appointment.patientName.toString(),
+          patients_id: widget.appointment.patientId.toString(),
           report_name: reports[i]['name'],
           report_image: downloadUrl,
           // Use the download URL
-          report_date: widget.appointment.dateTime,
+          report_date: widget.appointment.timestamp,
           report_image_name: '${reports[i]['image_name']}',
         );
 

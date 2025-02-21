@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ReportModel {
   late String patientID;
   late String reportName;
   late String reportImage;
-  late String reportDate;
+  late Timestamp reportDate;
   late String reportImageName;
 
   ReportModel(
@@ -31,7 +33,7 @@ class ReportModel {
           {String? patientID,
           String? reportName,
           String? reportImage,
-          String? reportDate,
+          Timestamp? reportDate,
           String? reportImageName}) =>
       ReportModel(
           patientID: patientID ?? this.patientID,

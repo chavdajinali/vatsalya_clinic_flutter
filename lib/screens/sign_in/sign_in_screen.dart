@@ -41,7 +41,7 @@ class _SignInScreenState extends State<SignInScreen> {
       padding: EdgeInsets.zero,
       child: Scaffold(
         body: Container(
-          color: Colors.transparent,
+          color: Colors.transparent,alignment: Alignment.center,
           child: BlocProvider(
             create: (context) => SignInBloc(),
             child: BlocListener<SignInBloc, SignInState>(

@@ -19,7 +19,6 @@ class HistoryPatientsListScreen extends StatefulWidget {
 }
 
 class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
-
   final DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
   DateTimeRange? selectedDateRange;
   late UserModel? userData;
@@ -31,15 +30,14 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
     _loadUserData();
     final today = DateTime.now();
     final firstDayOfMonth = DateTime(today.year, today.month, 1);
-    selectedDateRange = DateTimeRange(
-        start: firstDayOfMonth, end: today);
+    selectedDateRange = DateTimeRange(start: firstDayOfMonth, end: today);
   }
 
-  void _loadUserData()async {
+  void _loadUserData() async {
     userData = await getLoginDetails();
-    setState(()  {
+    setState(() {
       userData;
-    });  // Update the UI after fetching the user data
+    }); // Update the UI after fetching the user data
   }
 
   @override
@@ -62,15 +60,16 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                   ? state.patientList.isEmpty
                       ? const Center(child: Text("No patients found."))
                       : Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                          // crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       // Date Range Picker Button
                                       ElevatedButton(
@@ -97,7 +96,7 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                               : "${dateFormatter.format(selectedDateRange!.start)} to ${dateFormatter.format(selectedDateRange!.end)}",
                                         ),
                                       ),
-                                      const SizedBox(width: 16),
+                                      const SizedBox(width: 8),
 
                                       // Filter Button
                                       InkWell(
@@ -109,20 +108,25 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                                   // patientId: patientList[i].id,
                                                   startDate:
                                                       selectedDateRange!.start,
-                                                  endDate: selectedDateRange!.end));
+                                                  endDate:
+                                                      selectedDateRange!.end));
                                         },
                                         child: Container(
                                           decoration: BoxDecoration(
                                             gradient: const LinearGradient(
-                                              colors: [Colors.blue, Colors.green],
+                                              colors: [
+                                                Colors.blue,
+                                                Colors.green
+                                              ],
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,
                                             ),
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
                                           child: const Padding(
                                             padding: EdgeInsets.symmetric(
-                                                horizontal: 12.0, vertical: 6),
+                                                horizontal: 8.0, vertical: 6),
                                             child: Row(children: [
                                               Icon(
                                                 Icons.filter_alt,
@@ -136,7 +140,7 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                         ),
                                       ),
 
-                                      const SizedBox(width: 16),
+                                      const SizedBox(width: 8),
 
                                       // Reset Button
                                       InkWell(
@@ -151,16 +155,18 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                               .add(GetPatientHistory(
                                                   startDate:
                                                       selectedDateRange!.start,
-                                                  endDate: selectedDateRange!.end));
+                                                  endDate:
+                                                      selectedDateRange!.end));
                                         },
                                         child: Container(
                                           decoration: BoxDecoration(
                                             color: Colors.red,
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
                                           child: const Padding(
                                             padding: EdgeInsets.symmetric(
-                                                horizontal: 12.0, vertical: 6),
+                                                horizontal: 8.0, vertical: 6),
                                             child: Row(children: [
                                               Icon(
                                                 Icons.refresh,
@@ -176,25 +182,22 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                     ],
                                   ),
                                   if (userData!.role == "Super Admin")
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(12.0),
-                                        child: Text("Total Payment Amount : ${state.totalPaymentAmount}"),
-                                      )
-                                    ],
-                                  ) ,
+                                    Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Text(
+                                              "Total Payment Amount: ${state.totalPaymentAmount}"),
+                                        )
+                                      ],
+                                    ),
                                 ],
                               ),
                             ),
-                            state.isFilterPatientListState &&
-                                    state.patientList.isEmpty
-                                ? Center(
-                                    child: Text(state.errorMessage,
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black54)),
-                                  )
+                            state.isPatientHistoryLoading
+                                ? const Expanded(
+                                    child: Center(
+                                        child: CircularProgressIndicator()))
                                 : Expanded(
                                   child: ListView.builder(
                                       shrinkWrap: true,
@@ -202,7 +205,7 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                       itemBuilder: (context, index) {
                                         var patient = state.patientList[index];
                                         return Card(
-                                          margin: const EdgeInsets.only(
+                                          margin: const EdgeInsets.only(bottom: 2,
                                               top: 16, left: 16, right: 16),
                                           clipBehavior: Clip.antiAlias,
                                           color: Colors.white,
@@ -254,8 +257,13 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                                             const SizedBox(
                                                               height: 8,
                                                             ),
-                                                            if (userData!.role == "Super Admin")
-                                                              AppLabelValue(label: "Total Payment", value: "${patient.totalPayment}"),
+                                                            if (userData!.role ==
+                                                                "Super Admin")
+                                                              AppLabelValue(
+                                                                  label:
+                                                                      "Total Payment",
+                                                                  value:
+                                                                      "${patient.totalPayment}"),
                                                             const SizedBox(
                                                               height: 8,
                                                             ),
@@ -300,19 +308,23 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                                                 child: Text(
                                                                     "No history found."),
                                                               )
-                                                            : Wrap(
-                                                                children: getDates(
-                                                                    patient.appointments,
-                                                                    state
-                                                                        .selectedAppointment,
-                                                                    (appointment) {
-                                                                  BlocProvider.of<
-                                                                              HistoryPatientsBloc>(
-                                                                          context)
-                                                                      .add(SelectAppointment(
-                                                                          appointment));
-                                                                }),
-                                                              ),
+                                                            : Padding(
+                                                              padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 8),
+                                                              child: Wrap(
+                                                                  children: getDates(
+                                                                      patient
+                                                                          .appointments,
+                                                                      state
+                                                                          .selectedAppointment,
+                                                                      (appointment) {
+                                                                    BlocProvider.of<
+                                                                                HistoryPatientsBloc>(
+                                                                            context)
+                                                                        .add(SelectAppointment(
+                                                                            appointment));
+                                                                  }),
+                                                                ),
+                                                            ),
                                                         state.selectedAppointment
                                                                 .id.isNotEmpty
                                                             ? AppointmentInfo(
@@ -350,7 +362,7 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
           DateFormat('yyyy-MM-dd').format(appointment.timestamp.toDate());
 
       dates.add(Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 2.0,vertical: 2),
         child: OutlinedButton(
           onPressed: () {
             callback(appointment);

@@ -37,62 +37,59 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
-    return Container(
-        color: Colors.transparent,
-        child: Padding(
-          padding: EdgeInsets.zero,//EdgeInsets.symmetric(horizontal: width * 0.25),
-          child: Scaffold(
-            backgroundColor: Colors.white,
-            body: BlocListener<SignUpBloc, SignUpState>(
-              listener: (context, state) async {
-                if (state.isSuccess) {
-                  // Navigate to the Sign In screen
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const HomeScreen(), // Navigate to HomeScreen
-                      ));
-                } else {
-                  if (state.isFailure) {
-                    // Handle registration failure (show error message, etc.)
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content:
-                              Text('Registration failed. Please try again.')),
-                    );
-                  }
-                }
-              },
-              child: Center(
-                child: Form(
-                  key: _registrationFormKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const GradientText('New User'),
-                      const SizedBox(height: 30),
-                      _buildUserNameField(context),
-                      const SizedBox(height: 16),
-                      _buildEmailField(context),
-                      const SizedBox(height: 16),
-                      _buildURoleField(context),
-                      const SizedBox(height: 16),
-                      _buildPasswordField(context),
-                      const SizedBox(height: 16),
-                      _buildConfirmPasswordField(context),
-                      const SizedBox(height: 30),
-                      _buildSubmitButton(context),
-                      const SizedBox(height: 16),
-                      _buildSignInButton(context),
-                    ],
-                  ),
-                ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: BlocListener<SignUpBloc, SignUpState>(
+          listener: (context, state) async {
+            if (state.isSuccess) {
+              // Navigate to the Sign In screen
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const HomeScreen(), // Navigate to HomeScreen
+                  ));
+            } else {
+              if (state.isFailure) {
+                // Handle registration failure (show error message, etc.)
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content:
+                          Text('Registration failed. Please try again.')),
+                );
+              }
+            }
+          },
+          child: Center(
+            child: Form(
+              key: _registrationFormKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const GradientText('New User'),
+                  const SizedBox(height: 30),
+                  _buildUserNameField(context),
+                  const SizedBox(height: 16),
+                  _buildEmailField(context),
+                  const SizedBox(height: 16),
+                  _buildURoleField(context),
+                  const SizedBox(height: 16),
+                  _buildPasswordField(context),
+                  const SizedBox(height: 16),
+                  _buildConfirmPasswordField(context),
+                  const SizedBox(height: 30),
+                  _buildSubmitButton(context),
+                  const SizedBox(height: 16),
+                  _buildSignInButton(context),
+                ],
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildSubmitButton(BuildContext contextNew) {

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/models/report_model.dart';
+import 'package:vatsalya_clinic/utils/app_utils.dart';
 import '../../models/patients_model.dart';
 import 'history_patients_event.dart';
 import 'history_patients_state.dart';
@@ -89,8 +90,9 @@ class HistoryPatientsBloc
           patientList[i] = patientList[i].copyWith(isExpanded: false);
         }
       }
-      emit(
-          (state as HistoryPatientsSuccess).copyWith(patientList: patientList));
+      emit((state as HistoryPatientsSuccess).copyWith(
+          patientList: patientList,
+          selectedAppointment: AppointmentModel.fromJson({})));
     }
   }
 
@@ -108,7 +110,8 @@ class HistoryPatientsBloc
             .where('timestamp',
                 isGreaterThanOrEqualTo: Timestamp.fromDate(event.startDate))
             .where('timestamp',
-                isLessThanOrEqualTo: Timestamp.fromDate(event.endDate))
+                isLessThanOrEqualTo:
+                    Timestamp.fromDate(prepareEndDate(event.endDate)))
             .get();
 
         List<AppointmentModel> appointments = snapshot.docs
@@ -119,17 +122,25 @@ class HistoryPatientsBloc
         double totalpaymentAmount = 0.0;
         for (int i = 0; i < appointments.length; i++) {
           if (appointments[i].isPayment) {
-            mainTotalPayment +=  double.parse(appointments[i].paymentAmount);
+            mainTotalPayment += double.parse(appointments[i].paymentAmount);
             totalpaymentAmount += double.parse(appointments[i].paymentAmount);
           }
         }
 
-        patients.add(patient.copyWith(appointments: appointments,totalPayment: totalpaymentAmount));
+        patients.add(patient.copyWith(
+            appointments: appointments, totalPayment: totalpaymentAmount));
       }
 
-      emit((state as HistoryPatientsSuccess).copyWith(patientList: patients,totalPaymentAmount: mainTotalPayment));
+      emit((state as HistoryPatientsSuccess).copyWith(
+          patientList: patients,
+          totalPaymentAmount: mainTotalPayment,
+          isPatientHistoryLoading: false,
+          selectedAppointment: AppointmentModel.fromJson({})));
     } catch (e) {
-      emit((state as HistoryPatientsFailure).copyWith(erorr: e.toString()));
+      emit(
+        (state as HistoryPatientsSuccess).copyWith(
+            isPatientHistoryLoading: false, errorMessage: e.toString()),
+      );
     }
   }
 }
