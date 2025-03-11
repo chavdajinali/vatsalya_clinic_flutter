@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: AppBar(
                 title: Text(
-                  'Vatsalya Speech & Hearing Clinic Dashboard',
+                  'Vatsalya Speech & Hearing Clinic',
                   style: TextStyle(color: Colors.white, fontSize: fontSize),
                 ),
                 backgroundColor: Colors.transparent,
@@ -105,34 +105,38 @@ class _HomeScreenState extends State<HomeScreen> {
       width: 230,
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: SingleChildScrollView( // Make the entire column scrollable
-        child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.start,mainAxisAlignment: MainAxisAlignment.start,
-          // mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(height: isDesktop ? 20 : 14),
-            _buildNavItem(Icons.home, "Home", 0, navItemFontSize),
-            SizedBox(height: isDesktop ? 20 : 14),
-            _buildNavItem(Icons.person_2_rounded, 'Profile', 1, navItemFontSize),
-            SizedBox(height: isDesktop ? 20 : 14),
-            _buildNavItem(Icons.person_add, "Create Patient", 2, navItemFontSize),
-            SizedBox(height: isDesktop ? 20 : 14),
-            _buildNavItem(Icons.history, "History of Patients", 3, navItemFontSize),
-            SizedBox(height: isDesktop ? 20 : 14),
-            _buildNavItem(Icons.person, 'Reference', 4, navItemFontSize),
-            SizedBox(height: isDesktop ? 20 : 14),
-            _buildNavItem(Icons.exit_to_app, "Sign Out", 5, navItemFontSize, isSignOut: true),
-            SizedBox(height: isDesktop ? 20 : 14),
-            // Container(alignment: Alignment.bottomRight,
-            //   child: const Padding(
-            //     padding: EdgeInsets.all(8.0),
-            //     child: Text(
-            //       "Version 1.0.0 | 2024\nDeveloped by: Jinali Chavda\n(chavdajinali@gmail.com)",
-            //       style: TextStyle(fontSize: 10),
-            //     ),
-            //   ),
-            // ),
-          ],
+      child: SafeArea(
+        left: false,
+        right: false,
+        child: SingleChildScrollView( // Make the entire column scrollable
+          child: Column(
+            // crossAxisAlignment: CrossAxisAlignment.start,mainAxisAlignment: MainAxisAlignment.start,
+            // mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: isDesktop ? 20 : 14),
+              _buildNavItem(Icons.home, "Home", 0, navItemFontSize),
+              SizedBox(height: isDesktop ? 20 : 14),
+              _buildNavItem(Icons.person_2_rounded, 'Profile', 1, navItemFontSize),
+              SizedBox(height: isDesktop ? 20 : 14),
+              _buildNavItem(Icons.person_add, "Create Patient", 2, navItemFontSize),
+              SizedBox(height: isDesktop ? 20 : 14),
+              _buildNavItem(Icons.history, "History of Patients", 3, navItemFontSize),
+              SizedBox(height: isDesktop ? 20 : 14),
+              _buildNavItem(Icons.person, 'Reference', 4, navItemFontSize),
+              SizedBox(height: isDesktop ? 20 : 14),
+              _buildNavItem(Icons.exit_to_app, "Sign Out", 5, navItemFontSize, isSignOut: true),
+              SizedBox(height: isDesktop ? 20 : 14),
+              // Container(alignment: Alignment.bottomRight,
+              //   child: const Padding(
+              //     padding: EdgeInsets.all(8.0),
+              //     child: Text(
+              //       "Version 1.0.0 | 2024\nDeveloped by: Jinali Chavda\n(chavdajinali@gmail.com)",
+              //       style: TextStyle(fontSize: 10),
+              //     ),
+              //   ),
+              // ),
+            ],
+          ),
         ),
       ),
     );

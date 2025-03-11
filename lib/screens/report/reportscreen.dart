@@ -282,83 +282,139 @@ class _ReportScreenState extends State<ReportScreen> {
               ),
             ),
             const SizedBox(width: 16),
-            if (imageFile == null)
-              Expanded(
-                child: ElevatedButton.icon(
-                  icon: Icon(Icons.photo_library, size: isDesktop ? 16 : 12),
-                  label: Text('Gallery',
-                      style: TextStyle(fontSize: isDesktop ? 16 : 12)),
+            Column(
+              children: [
+                if (imageFile == null)
+                ElevatedButton.icon(
+                  label: const Text('Gallery', style: TextStyle(fontSize: 12)),
                   onPressed: () => _pickImage(ImageSource.gallery),
                   style: ElevatedButton.styleFrom(
-                    minimumSize:
-                        isDesktop ? const Size(120, 50) : const Size(60, 40),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     elevation: 4,
                   ),
-                ),
-              )
-            else
-              Expanded(
-                child: Row(
-                  children: [
+                )
+                else
+                  Row(children: [
                     GestureDetector(
                       onTap: () => _pickImage(ImageSource.gallery),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: kIsWeb
                             ? (base64String != null
-                                ? Image.memory(
-                                    base64Decode(base64String!),
-                                    width: isDesktop ? 120 : 80,
-                                    height: 50,
-                                    fit: BoxFit.cover,
-                                  )
-                                : const Icon(Icons.image,
-                                    size: 50, color: Colors.grey))
+                            ? Image.memory(
+                          base64Decode(base64String!),
+                          width: isDesktop ? 120 : 80,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        )
+                            : const Icon(Icons.image,
+                            size: 50, color: Colors.grey))
                             : (imageFile != null
-                                ? Image.file(
-                                    File(imageFile!.path),
-                                    width: isDesktop ? 120 : 80,
-                                    height: 50,
-                                    fit: BoxFit.cover,
-                                  )
-                                : const Icon(Icons.image,
-                                    size: 50, color: Colors.grey)),
+                            ? Image.file(
+                          File(imageFile!.path),
+                          width: isDesktop ? 120 : 80,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        )
+                            : const Icon(Icons.image,
+                            size: 50, color: Colors.grey)),
                       ),
                     ),
-                    SizedBox(width: isDesktop ? 8 : 2),
-                    Expanded(
-                        child: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                imageFile = null; // Clear the picked image
-                              });
-                            },
-                            icon: const Icon(Icons.cancel_outlined))),
-                  ],
-                ),
-              ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: ElevatedButton.icon(
-                icon: Icon(Icons.save, size: isDesktop ? 16 : 12),
-                label: Text('SAVE',
-                    style: TextStyle(fontSize: isDesktop ? 16 : 12)),
-                onPressed: saveReport,
-                style: ElevatedButton.styleFrom(
-                  minimumSize:
-                      isDesktop ? const Size(120, 50) : const Size(60, 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  ],),
+                const SizedBox(height: 5),
+                ElevatedButton.icon(
+                  label: const Text('Save', style: TextStyle(fontSize: 12)),
+                  onPressed: saveReport,
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 4,
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  elevation: 4,
                 ),
-              ),
+              ],
             ),
+            // if (imageFile == null)
+            //   Expanded(
+            //     child: ElevatedButton.icon(
+            //       icon: Icon(Icons.photo_library, size: isDesktop ? 16 : 12),
+            //       label: Text('Gallery',
+            //           style: TextStyle(fontSize: isDesktop ? 16 : 12)),
+            //       onPressed: () => _pickImage(ImageSource.gallery),
+            //       style: ElevatedButton.styleFrom(
+            //         minimumSize:
+            //             isDesktop ? const Size(120, 50) : const Size(60, 40),
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(12),
+            //         ),
+            //         padding: const EdgeInsets.symmetric(vertical: 12),
+            //         elevation: 4,
+            //       ),
+            //     ),
+            //   )
+            // else
+            //   Expanded(
+            //     child: Row(
+            //       children: [
+            //         GestureDetector(
+            //           onTap: () => _pickImage(ImageSource.gallery),
+            //           child: ClipRRect(
+            //             borderRadius: BorderRadius.circular(12),
+            //             child: kIsWeb
+            //                 ? (base64String != null
+            //                     ? Image.memory(
+            //                         base64Decode(base64String!),
+            //                         width: isDesktop ? 120 : 80,
+            //                         height: 50,
+            //                         fit: BoxFit.cover,
+            //                       )
+            //                     : const Icon(Icons.image,
+            //                         size: 50, color: Colors.grey))
+            //                 : (imageFile != null
+            //                     ? Image.file(
+            //                         File(imageFile!.path),
+            //                         width: isDesktop ? 120 : 80,
+            //                         height: 50,
+            //                         fit: BoxFit.cover,
+            //                       )
+            //                     : const Icon(Icons.image,
+            //                         size: 50, color: Colors.grey)),
+            //           ),
+            //         ),
+            //         SizedBox(width: isDesktop ? 8 : 2),
+            //         Expanded(
+            //             child: IconButton(
+            //                 onPressed: () {
+            //                   setState(() {
+            //                     imageFile = null; // Clear the picked image
+            //                   });
+            //                 },
+            //                 icon: const Icon(Icons.cancel_outlined))),
+            //       ],
+            //     ),
+            //   ),
+            // const SizedBox(width: 8),
+            // Expanded(
+            //   child: ElevatedButton.icon(
+            //     icon: Icon(Icons.save, size: isDesktop ? 16 : 12),
+            //     label: Text('SAVE',
+            //         style: TextStyle(fontSize: isDesktop ? 16 : 12)),
+            //     onPressed: saveReport,
+            //     style: ElevatedButton.styleFrom(
+            //       minimumSize:
+            //           isDesktop ? const Size(120, 50) : const Size(60, 40),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(12),
+            //       ),
+            //       padding: const EdgeInsets.symmetric(vertical: 12),
+            //       elevation: 4,
+            //     ),
+            //   ),
+            // ),
           ],
         ),
         const SizedBox(height: 20),

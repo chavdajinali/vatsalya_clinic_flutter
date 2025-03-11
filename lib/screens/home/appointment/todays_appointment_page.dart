@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,6 +26,20 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
   void initState() {
     super.initState();
     _loadAppointmentDetails();
+  }
+
+  String getSeprateDateTime(String dateTimeString,bool isDateOrNot) {
+      // Parse the full date-time
+      DateFormat format = DateFormat("dd/MM/yyyy hh:mm a");
+      DateTime parsedDateTime = format.parse(dateTimeString);
+      String separatedDate = DateFormat("dd/MM/yyyy").format(parsedDateTime);
+      String separatedTime12hr = DateFormat("hh:mm a").format(parsedDateTime);
+
+      if (isDateOrNot) {
+        return separatedDate;
+      } else {
+        return separatedTime12hr;
+      }
   }
 
   Future<void> _loadAppointmentDetails() async {
@@ -131,7 +146,7 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
             ),
           ),
           GradientButton(
-            text: 'Book New Appointment',
+            text: 'Book Appointment',
             fontsize: buttonFontSize,
             onPressed: () async {
               await Navigator.push(
@@ -188,7 +203,11 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                           fontSize: fontSize, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   Text(
-                    'Date & Time: ${appointment.dateTime}',
+                    'Date: ${getSeprateDateTime(appointment.dateTime, true)}',
+                    style: TextStyle(color: Colors.black54, fontSize: fontSize),
+                  ),
+                  Text(
+                    'Time: ${getSeprateDateTime(appointment.dateTime, false)}',
                     style: TextStyle(color: Colors.black54, fontSize: fontSize),
                   ),
                 ],

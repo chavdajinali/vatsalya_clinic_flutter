@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:vatsalya_clinic/screens/create_patients/create_patients_bloc.dart';
@@ -89,6 +90,7 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
               labelText: 'Gender',
               onTap: () async {
                 final selectedGender = await showModalBottomSheet<String>(
+                  useSafeArea: false,
                   context: context,
                   builder: (context) {
                     return Column(
@@ -132,12 +134,17 @@ class _CreatePatientsScreenState extends State<CreatePatientsScreen> {
             buildTextField(
               controller: mobileController,
               labelText: 'Mobile Number',
+              inputformatter: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ],
+              keyboardType: TextInputType.phone,
               onValidate: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your mobile number';
                 }
-                if (value.length != 10) {
-                  return 'Please enter a 10-digit number';
+                if (!RegExp(r'^[6-9]\d{9}$').hasMatch(value)) { // India example
+                  return 'Enter a valid 10-digit mobile number';
                 }
                 return null;
               },

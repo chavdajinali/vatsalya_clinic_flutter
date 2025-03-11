@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // TextField Builder
 Widget buildTextField({
@@ -8,9 +9,11 @@ Widget buildTextField({
       String? Function(String?)? onValidate,
       bool? readOnly,
       InputDecoration? decoration,
+      List<TextInputFormatter>? inputformatter,
       Function()? onTap, TextInputType? keyboardType}) {
         return TextFormField(
           keyboardType: keyboardType,
+          inputFormatters: inputformatter,
           controller: controller,
           decoration: decoration ?? InputDecoration(
             labelText: labelText,

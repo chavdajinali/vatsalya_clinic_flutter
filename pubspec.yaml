@@ -50,6 +50,7 @@ dependencies:
   http: ^1.2.2
   universal_html: ^2.0.2
   permission_handler: ^11.1.0
+  flutter_launcher_icons: ^0.13.1
   dio: ^5.4.0  # For handling HTTP requests
 
 dev_dependencies:
@@ -67,6 +68,12 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+
+flutter_icons:
+  android: true
+  ios: false
+  image_path: "assets/images/logo.jpeg"  # Change this to your icon path
+
 flutter:
 
   # The following line ensures that the Material Icons font is

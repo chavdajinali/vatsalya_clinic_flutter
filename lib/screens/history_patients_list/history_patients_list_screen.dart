@@ -63,7 +63,7 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                           // crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(2.0),
                               child: Column(
                                 children: [
                                   Row(
@@ -96,7 +96,7 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                               : "${dateFormatter.format(selectedDateRange!.start)} to ${dateFormatter.format(selectedDateRange!.end)}",
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
+                                      const SizedBox(width: 4),
 
                                       // Filter Button
                                       InkWell(
@@ -122,11 +122,11 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                               end: Alignment.bottomRight,
                                             ),
                                             borderRadius:
-                                                BorderRadius.circular(12),
+                                                BorderRadius.circular(8),
                                           ),
                                           child: const Padding(
                                             padding: EdgeInsets.symmetric(
-                                                horizontal: 8.0, vertical: 6),
+                                                horizontal: 4.0, vertical: 6),
                                             child: Row(children: [
                                               Icon(
                                                 Icons.filter_alt,
@@ -140,7 +140,7 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                         ),
                                       ),
 
-                                      const SizedBox(width: 8),
+                                      const SizedBox(width: 4),
 
                                       // Reset Button
                                       InkWell(
@@ -162,11 +162,11 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                           decoration: BoxDecoration(
                                             color: Colors.red,
                                             borderRadius:
-                                                BorderRadius.circular(12),
+                                                BorderRadius.circular(8),
                                           ),
                                           child: const Padding(
                                             padding: EdgeInsets.symmetric(
-                                                horizontal: 8.0, vertical: 6),
+                                                horizontal: 4.0, vertical: 6),
                                             child: Row(children: [
                                               Icon(
                                                 Icons.refresh,
