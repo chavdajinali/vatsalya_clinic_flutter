@@ -68,8 +68,8 @@ class _PaymentDialogState extends State<PaymentDialog> {
             children: [
               // Payment Type Dropdown
               DropdownSearch<String>(
-                decoratorProps: DropDownDecoratorProps(
-                    decoration: InputDecoration(
+                dropdownDecoratorProps: DropDownDecoratorProps(
+                    dropdownSearchDecoration: InputDecoration(
                   labelText: 'Payment Type',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -77,7 +77,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                   fillColor: Colors.grey[200],
                   filled: true,
                 )),
-                items: (f, cs) => paymentType,
+                items: paymentType,
                 selectedItem: selectedPaymentType,
                 onChanged: (value) {
                   setState(() {

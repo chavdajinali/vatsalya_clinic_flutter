@@ -144,7 +144,7 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
                   // Name TextField with Search Icon
                   DropdownSearch<PatientsModel>(
                     key: dropDownKey,
-                    items: (filter, infiniteScrollProps) => patientsList,
+                    items: patientsList,
                     onChanged: (value) {
                       setState(() {
                         selectedPatient = value;
@@ -152,8 +152,8 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
                     },
                     compareFn: (item1, item2) => item1.id == item2.id,
                     itemAsString: (patient) => patient.name,
-                    decoratorProps: DropDownDecoratorProps(
-                      decoration: InputDecoration(
+                    dropdownDecoratorProps: DropDownDecoratorProps(
+                      dropdownSearchDecoration: InputDecoration(
                         labelText: selectedPatient == null
                             ? "Select Patient name"
                             : 'Patient Name',

@@ -1,15 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/foundation.dart'; // For kIsWeb
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
+import 'package:vatsalya_clinic/models/report_name_add_model.dart';
+import 'package:vatsalya_clinic/screens/graph/hearingtesttable.dart';
 import 'package:vatsalya_clinic/utils/CustomPicker.dart';
 import 'package:vatsalya_clinic/utils/app_loading_indicator.dart';
 import 'package:vatsalya_clinic/utils/app_utils.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
+import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
 import 'package:vatsalya_clinic/utils/textfield_builder.dart';
 import '../../main.dart';
 import 'reportfirestoreservice.dart';
@@ -25,17 +29,8 @@ class ReportScreen extends StatefulWidget {
 }
 
 class _ReportScreenState extends State<ReportScreen> {
-  final List<String> reportNames = [
-    'PTA',
-    'Impedance',
-    'ETF Test',
-    'OAE Test',
-    'BERA Test',
-    'ASSR Test',
-    'Speech Assessment',
-    'Special Test',
-    'Bill'
-  ];
+  List<ReportNameAddModel> reportNames = [];
+  List<String> reportNameList = [];
   String? selectedReport;
   final ImagePicker _picker = ImagePicker();
   XFile? imageFile;
@@ -43,6 +38,7 @@ class _ReportScreenState extends State<ReportScreen> {
   final TextEditingController ageController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+  final dropDownKey = GlobalKey<DropdownSearchState>();
 
   // Variable to hold patient data from Firestore
   Map<String, dynamic>? patientData;
@@ -75,6 +71,15 @@ class _ReportScreenState extends State<ReportScreen> {
         print("Error picking image: $e");
       }
     }
+  }
+
+  // Fetch reportName data from Firestore
+  Future<void> _loadReportNameOptions() async {
+    reportNames = await getNamesOfReportFromFirestore();
+    for (int i=0;i<reportNames.length;i++) {
+      reportNameList.add(reportNames[i].report_name);
+    }
+    setState(() {});
   }
 
   // Fetch patient data from Firestore
@@ -252,33 +257,34 @@ class _ReportScreenState extends State<ReportScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: buildTextField(
-                controller: TextEditingController(text: selectedReport),
-                onTap: () => CustomPicker.show(
-                  context: context,
-                  items: reportNames,
-                  title: 'Select Report',
-                  onSelected: (value) {
-                    setState(() {
-                      selectedReport = value;
-                    });
-                  },
-                ),
-                readOnly: true,
-                labelText: 'Select Report',
-                decoration: InputDecoration(
-                  labelText: "Select Report",
-                  suffixIcon: const Icon(Icons.arrow_drop_down),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+              child: DropdownSearch<ReportNameAddModel>(
+                key: dropDownKey,
+                items: reportNames, //(filter, loadProps) {
+                //   return reportNames.where((report){ return report.report_name.isNotEmpty;}).toList();
+                // },
+                onChanged: (value) {
+                  setState(() {
+                    selectedReport = value?.report_name;
+                  });
+                },
+                compareFn: (item1, item2) => item1.id == item2.id,
+                itemAsString: (reportName) => reportName.report_name,
+                dropdownDecoratorProps: DropDownDecoratorProps(
+                  baseStyle: TextStyle(fontSize: 14),
+                  dropdownSearchDecoration: InputDecoration(
+                    labelText: selectedReport == null
+                        ? "Select Report name"
+                        : 'Report Name',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    fillColor: Colors.grey[200],
+                    filled: true,
                   ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                 ),
-                obscureText: false,
+                popupProps: const PopupProps.menu(
+                  fit: FlexFit.loose,
+                  constraints: BoxConstraints(),
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -338,83 +344,6 @@ class _ReportScreenState extends State<ReportScreen> {
                 ),
               ],
             ),
-            // if (imageFile == null)
-            //   Expanded(
-            //     child: ElevatedButton.icon(
-            //       icon: Icon(Icons.photo_library, size: isDesktop ? 16 : 12),
-            //       label: Text('Gallery',
-            //           style: TextStyle(fontSize: isDesktop ? 16 : 12)),
-            //       onPressed: () => _pickImage(ImageSource.gallery),
-            //       style: ElevatedButton.styleFrom(
-            //         minimumSize:
-            //             isDesktop ? const Size(120, 50) : const Size(60, 40),
-            //         shape: RoundedRectangleBorder(
-            //           borderRadius: BorderRadius.circular(12),
-            //         ),
-            //         padding: const EdgeInsets.symmetric(vertical: 12),
-            //         elevation: 4,
-            //       ),
-            //     ),
-            //   )
-            // else
-            //   Expanded(
-            //     child: Row(
-            //       children: [
-            //         GestureDetector(
-            //           onTap: () => _pickImage(ImageSource.gallery),
-            //           child: ClipRRect(
-            //             borderRadius: BorderRadius.circular(12),
-            //             child: kIsWeb
-            //                 ? (base64String != null
-            //                     ? Image.memory(
-            //                         base64Decode(base64String!),
-            //                         width: isDesktop ? 120 : 80,
-            //                         height: 50,
-            //                         fit: BoxFit.cover,
-            //                       )
-            //                     : const Icon(Icons.image,
-            //                         size: 50, color: Colors.grey))
-            //                 : (imageFile != null
-            //                     ? Image.file(
-            //                         File(imageFile!.path),
-            //                         width: isDesktop ? 120 : 80,
-            //                         height: 50,
-            //                         fit: BoxFit.cover,
-            //                       )
-            //                     : const Icon(Icons.image,
-            //                         size: 50, color: Colors.grey)),
-            //           ),
-            //         ),
-            //         SizedBox(width: isDesktop ? 8 : 2),
-            //         Expanded(
-            //             child: IconButton(
-            //                 onPressed: () {
-            //                   setState(() {
-            //                     imageFile = null; // Clear the picked image
-            //                   });
-            //                 },
-            //                 icon: const Icon(Icons.cancel_outlined))),
-            //       ],
-            //     ),
-            //   ),
-            // const SizedBox(width: 8),
-            // Expanded(
-            //   child: ElevatedButton.icon(
-            //     icon: Icon(Icons.save, size: isDesktop ? 16 : 12),
-            //     label: Text('SAVE',
-            //         style: TextStyle(fontSize: isDesktop ? 16 : 12)),
-            //     onPressed: saveReport,
-            //     style: ElevatedButton.styleFrom(
-            //       minimumSize:
-            //           isDesktop ? const Size(120, 50) : const Size(60, 40),
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(12),
-            //       ),
-            //       padding: const EdgeInsets.symmetric(vertical: 12),
-            //       elevation: 4,
-            //     ),
-            //   ),
-            // ),
           ],
         ),
         const SizedBox(height: 20),
@@ -474,6 +403,7 @@ class _ReportScreenState extends State<ReportScreen> {
   void initState() {
     super.initState();
     fetchPatientData();
+    _loadReportNameOptions();
   }
 
   @override
@@ -485,6 +415,15 @@ class _ReportScreenState extends State<ReportScreen> {
         title: Text('Add reports for patient',
             style: TextStyle(fontSize: isDesktop ? 20 : 16)),
         elevation: 2,
+        actions: [
+        IconButton(onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HearingTestTable(),
+            ),
+          );
+        }, icon: const Icon(Icons.auto_graph,color: Colors.black)),],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

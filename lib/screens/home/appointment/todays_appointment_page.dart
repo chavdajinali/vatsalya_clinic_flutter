@@ -5,10 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/screens/book_appoinment/book_appoinment_screen.dart';
+import 'package:vatsalya_clinic/screens/graph/hearingtesttable.dart';
 import 'package:vatsalya_clinic/screens/report/reportscreen.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
 import 'package:vatsalya_clinic/utils/ResponsiveBuilder.dart';
-import 'package:vatsalya_clinic/utils/screen_utils.dart';
 import '../../payment/payment_dialog.dart';
 
 class TodaysAppointmentPage extends StatefulWidget {
@@ -218,7 +218,7 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
               children: [
                 _buildAddReportsButton(appointment, fontSize),
                 const SizedBox(height: 8),
-                _buildPaymentButton(appointment, fontSize),
+                _buildPaymentButton(appointment, fontSize)
               ],
             ),
           ],

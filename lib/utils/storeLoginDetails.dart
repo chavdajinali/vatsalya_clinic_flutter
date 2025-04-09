@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/models/patients_model.dart';
 import 'package:vatsalya_clinic/models/refrence_model.dart';
+import 'package:vatsalya_clinic/models/report_name_add_model.dart';
 import 'package:vatsalya_clinic/models/user_model.dart';
 
 Future<void> storeLoginDetails(UserModel userDetails) async {
@@ -78,6 +79,25 @@ Future<List<PatientsModel>> getNamesOfPatientsFromFirestore() async {
   }
 
   return PatientsModelList;
+}
+
+Future<List<ReportNameAddModel>> getNamesOfReportFromFirestore() async {
+  List<ReportNameAddModel> ReportNameGetList = [];
+
+  // Get a reference to the Firestore collection
+  final CollectionReference reportTbl = FirebaseFirestore.instance.collection('report_name_list_tbl');
+
+  // Query the collection for all documents
+  QuerySnapshot querySnapshot = await reportTbl.get();
+
+  // Iterate through the documents and extract the 'name' field
+  for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+    var reportName = ReportNameAddModel.fromJson(doc.data() as Map<String, dynamic>);
+    // reportName.id = doc.id;
+    ReportNameGetList.add(reportName);
+  }
+
+  return ReportNameGetList;
 }
 
 Future<void> removeSpecificData(String key) async {
