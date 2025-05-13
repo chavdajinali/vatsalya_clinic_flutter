@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../main.dart';
@@ -8,21 +7,24 @@ class GradientButton extends StatelessWidget {
   final double? fontsize;
   final VoidCallback onPressed;
   final EdgeInsets? padding;
+  final bool isLoading;
 
   const GradientButton({
-    Key? key,
+    super.key,
     required this.text,
     this.fontsize,
     required this.onPressed,
     this.padding,
-  }) : super(key: key);
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onPressed,
+      onTap: isLoading ? null : onPressed,
       child: Container(
-        padding: padding ?? const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+        padding:
+            padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Colors.blue, Colors.green], // Apply gradient colors here
@@ -32,14 +34,16 @@ class GradientButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         alignment: Alignment.center,
-        child: Text(
-          text,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: fontsize ?? 14,
-          ),
-        ),
+        child: isLoading
+            ? CircularProgressIndicator()
+            : Text(
+                text,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: fontsize ?? 14,
+                ),
+              ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -205,10 +206,10 @@ class _AppointmentInfoState extends State<AppointmentInfo> {
                           PermissionStatus status = await Permission.storage.request();
                           return status.isGranted;
                         }*/
-                        if (Platform.isAndroid) {
-                          downloadInAndroid(report.reportImage);
-                        } else {
+                        if (kIsWeb) {
                           downloadInWeb(report.reportImage);
+                        } else {
+                          downloadInAndroid(report.reportImage);
                         }
                       },
                       icon: const Icon(Icons.download, color: Colors.blue),

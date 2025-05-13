@@ -23,12 +23,14 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _emailController =
-      // TextEditingController(text: "jinali@gmail.com");
-      TextEditingController();
+      TextEditingController(text: "jinali@gmail.com");
+
+  // TextEditingController();
 
   final TextEditingController _passwordController =
-      // TextEditingController(text: "J@240298");
-      TextEditingController();
+      TextEditingController(text: "J@240298");
+
+  // TextEditingController();
 
   ValidationUtils validationUtils = ValidationUtils();
 
@@ -36,12 +38,13 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
+    // var width = MediaQuery.of(context).size.width;
     return Padding(
       padding: EdgeInsets.zero,
       child: Scaffold(
         body: Container(
-          color: Colors.transparent,alignment: Alignment.center,
+          color: Colors.transparent,
+          alignment: Alignment.center,
           child: BlocProvider(
             create: (context) => SignInBloc(),
             child: BlocListener<SignInBloc, SignInState>(
@@ -88,7 +91,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         _buildEmailField(context),
                         const SizedBox(height: 20),
                         _buildPasswordField(context),
-                        const SizedBox(height:20),
+                        const SizedBox(height: 20),
                         BlocBuilder<SignInBloc, SignInState>(
                           builder: (context, state) {
                             if (state is SignInLoading) {

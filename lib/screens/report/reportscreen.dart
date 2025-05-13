@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/models/report_name_add_model.dart';
-import 'package:vatsalya_clinic/screens/graph/hearingtesttable.dart';
+import 'package:vatsalya_clinic/screens/graph/audio_gram_chart_screen.dart';
 import 'package:vatsalya_clinic/utils/CustomPicker.dart';
 import 'package:vatsalya_clinic/utils/app_loading_indicator.dart';
 import 'package:vatsalya_clinic/utils/app_utils.dart';
@@ -33,7 +33,8 @@ class _ReportScreenState extends State<ReportScreen> {
   List<String> reportNameList = [];
   String? selectedReport;
   final ImagePicker _picker = ImagePicker();
-  XFile? imageFile;
+
+  // XFile? imageFile;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
@@ -56,7 +57,7 @@ class _ReportScreenState extends State<ReportScreen> {
         var bytes = await pickedFile.readAsBytes();
         setState(() {
           // Update the image file with the compressed file
-          imageFile = pickedFile;
+          // imageFile = pickedFile;
 
           // Update the base64 string
           base64String = base64Encode(bytes);
@@ -76,7 +77,7 @@ class _ReportScreenState extends State<ReportScreen> {
   // Fetch reportName data from Firestore
   Future<void> _loadReportNameOptions() async {
     reportNames = await getNamesOfReportFromFirestore();
-    for (int i=0;i<reportNames.length;i++) {
+    for (int i = 0; i < reportNames.length; i++) {
       reportNameList.add(reportNames[i].report_name);
     }
     setState(() {});
@@ -120,7 +121,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
       TaskSnapshot snapshot;
 
-      if (kIsWeb) {
+      if (report["base64"] != null) {
         // For web, use `putData` with the file bytes
         // final bytes = await imageFile.readAsBytes();
         snapshot = await storageRef.putData(base64Decode(report["base64"]));
@@ -138,25 +139,27 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   Future<void> saveReport() async {
-    if (selectedReport != null && imageFile != null) {
-      var fileLength = (await imageFile!.length()) / 1024;
+    if (selectedReport != null && base64String != null) {
+      // var fileLength = (await imageFile!.length()) / 1024;
 
       setState(() {
         reports.add({
           'name': selectedReport,
-          'image': imageFile!.path, // Save the Firebase Storage URL
+          // 'image': imageFile!.path, // Save the Firebase Storage URL
           'base64': base64String, // Save the Firebase Storage URL
-          'image_name': imageFile!.name,
-          'length': "${fileLength.toStringAsFixed(2)} kb",
+          // 'image_name': imageFile!.name,
+          'image_name':
+              "${widget.appointment.patientName.toLowerCase().replaceAll(" ", "")}_${selectedReport!.toLowerCase()}",
+          // 'length': "${fileLength.toStringAsFixed(2)} kb",
         });
 
         // Show Snackbar before clearing the values
-        showSnackBar("Report saved: $selectedReport", context);
+        // showSnackBar("Report saved: $selectedReport", context);
 
         // Clear the selected report and image
         selectedReport = null;
-        imageFile = null;
-        base64String = "";
+        // imageFile = null;
+        base64String = null;
       });
 
       setState(() {
@@ -259,7 +262,8 @@ class _ReportScreenState extends State<ReportScreen> {
             Expanded(
               child: DropdownSearch<ReportNameAddModel>(
                 key: dropDownKey,
-                items: reportNames, //(filter, loadProps) {
+                items: reportNames,
+                //(filter, loadProps) {
                 //   return reportNames.where((report){ return report.report_name.isNotEmpty;}).toList();
                 // },
                 onChanged: (value) {
@@ -287,62 +291,97 @@ class _ReportScreenState extends State<ReportScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
-            Column(
-              children: [
-                if (imageFile == null)
-                ElevatedButton.icon(
-                  label: const Text('Gallery', style: TextStyle(fontSize: 12)),
-                  onPressed: () => _pickImage(ImageSource.gallery),
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    elevation: 4,
-                  ),
-                )
-                else
-                  Row(children: [
-                    GestureDetector(
-                      onTap: () => _pickImage(ImageSource.gallery),
-                      child: ClipRRect(
+            const SizedBox(width: 8),
+            if (base64String == null)
+              Row(
+                children: [
+                  ElevatedButton.icon(
+                    label: const Text('Audiogram Chart',
+                        style: TextStyle(fontSize: 12)),
+                    onPressed: () async {
+                      var audiogram = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (c) => AudioGramChartScreen(
+                                    appointmentModel: widget.appointment,
+                                  )));
+                      if (audiogram != null) {
+                        setState(() {
+                          base64String = audiogram;
+                        });
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        child: kIsWeb
-                            ? (base64String != null
-                            ? Image.memory(
-                          base64Decode(base64String!),
-                          width: isDesktop ? 120 : 80,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        )
-                            : const Icon(Icons.image,
-                            size: 50, color: Colors.grey))
-                            : (imageFile != null
-                            ? Image.file(
-                          File(imageFile!.path),
-                          width: isDesktop ? 120 : 80,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        )
-                            : const Icon(Icons.image,
-                            size: 50, color: Colors.grey)),
                       ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 8),
+                      elevation: 4,
                     ),
-                  ],),
-                const SizedBox(height: 5),
-                ElevatedButton.icon(
-                  label: const Text('Save', style: TextStyle(fontSize: 12)),
-                  onPressed: saveReport,
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    elevation: 4,
                   ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  ElevatedButton.icon(
+                    label:
+                        const Text('Gallery', style: TextStyle(fontSize: 12)),
+                    onPressed: () => _pickImage(ImageSource.gallery),
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 8),
+                      elevation: 4,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              )
+            else
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => _pickImage(ImageSource.gallery),
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: (base64String != null
+                            ? Image.memory(
+                                base64Decode(base64String!),
+                                width: isDesktop ? 120 : 80,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              )
+                            : const Icon(Icons.image,
+                                size: 50, color: Colors.grey))
+                        // : (imageFile != null
+                        //     ? Image.file(
+                        //         File(imageFile!.path),
+                        //         width: isDesktop ? 120 : 80,
+                        //         height: 50,
+                        //         fit: BoxFit.cover,
+                        //       )
+                        //     : const Icon(Icons.image,
+                        //         size: 50, color: Colors.grey)),
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            SizedBox(
+              width: 8,
+            ),
+            ElevatedButton.icon(
+              label: const Text('Save', style: TextStyle(fontSize: 12)),
+              onPressed: saveReport,
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ],
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                elevation: 4,
+              ),
             ),
           ],
         ),
@@ -365,7 +404,7 @@ class _ReportScreenState extends State<ReportScreen> {
                       icon: const Icon(Icons.close)),
                   leading: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: kIsWeb
+                      child: report["base64"] != null
                           ? Image.memory(
                               base64Decode(report["base64"]),
                               width: 120,
@@ -379,7 +418,7 @@ class _ReportScreenState extends State<ReportScreen> {
                               fit: BoxFit.cover,
                             )),
                   title: Text(report['name']),
-                  subtitle: Text(report['length']),
+                  // subtitle: Text(report['length']),
                 ),
               );
             },
@@ -415,15 +454,6 @@ class _ReportScreenState extends State<ReportScreen> {
         title: Text('Add reports for patient',
             style: TextStyle(fontSize: isDesktop ? 20 : 16)),
         elevation: 2,
-        actions: [
-        IconButton(onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HearingTestTable(),
-            ),
-          );
-        }, icon: const Icon(Icons.auto_graph,color: Colors.black)),],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

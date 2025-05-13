@@ -52,7 +52,10 @@ dependencies:
   permission_handler: ^11.1.0
   flutter_launcher_icons: ^0.14.3
   dio: ^5.4.0  # For handling HTTP requests
-  fl_chart: ^0.63.0
+  fl_chart: ^0.69.0
+  # Used to export audio gram as a pdf
+  pdf: ^3.11.3
+  printing: ^5.14.2
 
 dev_dependencies:
   flutter_test:

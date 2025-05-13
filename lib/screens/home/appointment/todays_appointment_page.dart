@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/screens/book_appoinment/book_appoinment_screen.dart';
-import 'package:vatsalya_clinic/screens/graph/hearingtesttable.dart';
+import 'package:vatsalya_clinic/screens/graph/audio_gram_chart_screen.dart';
 import 'package:vatsalya_clinic/screens/report/reportscreen.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
 import 'package:vatsalya_clinic/utils/ResponsiveBuilder.dart';
