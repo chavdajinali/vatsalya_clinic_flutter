@@ -23,14 +23,14 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _emailController =
-      TextEditingController(text: "jinali@gmail.com");
+      // TextEditingController(text: "jinali@gmail.com");
 
-  // TextEditingController();
+  TextEditingController();
 
   final TextEditingController _passwordController =
-      TextEditingController(text: "J@240298");
+      // TextEditingController(text: "J@240298");
 
-  // TextEditingController();
+  TextEditingController();
 
   ValidationUtils validationUtils = ValidationUtils();
 
@@ -82,7 +82,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         Center(
                           child: Image.asset(
                             'assets/images/logo.jpeg',
-                            height: (isTablet || isMobile ? 220 : 80),
+                            height: (isTablet || isMobile ? 100 : 80),
                           ),
                         ),
                         const Center(child: GradientText('Welcome Back!')),

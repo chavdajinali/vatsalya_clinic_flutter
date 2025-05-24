@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -28,18 +27,18 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
     _loadAppointmentDetails();
   }
 
-  String getSeprateDateTime(String dateTimeString,bool isDateOrNot) {
-      // Parse the full date-time
-      DateFormat format = DateFormat("dd/MM/yyyy hh:mm a");
-      DateTime parsedDateTime = format.parse(dateTimeString);
-      String separatedDate = DateFormat("dd/MM/yyyy").format(parsedDateTime);
-      String separatedTime12hr = DateFormat("hh:mm a").format(parsedDateTime);
+  String getSeprateDateTime(String dateTimeString, bool isDateOrNot) {
+    // Parse the full date-time
+    DateFormat format = DateFormat("dd/MM/yyyy hh:mm a");
+    DateTime parsedDateTime = format.parse(dateTimeString);
+    String separatedDate = DateFormat("dd/MM/yyyy").format(parsedDateTime);
+    String separatedTime12hr = DateFormat("hh:mm a").format(parsedDateTime);
 
-      if (isDateOrNot) {
-        return separatedDate;
-      } else {
-        return separatedTime12hr;
-      }
+    if (isDateOrNot) {
+      return separatedDate;
+    } else {
+      return separatedTime12hr;
+    }
   }
 
   Future<void> _loadAppointmentDetails() async {
@@ -190,39 +189,122 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
   Widget _buildAppointmentCard(AppointmentModel appointment, double fontSize) {
     return Card(
       color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Name: ${appointment.patientName}',
-                      style: TextStyle(
-                          fontSize: fontSize, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Date: ${getSeprateDateTime(appointment.dateTime, true)}',
-                    style: TextStyle(color: Colors.black54, fontSize: fontSize),
-                  ),
-                  Text(
-                    'Time: ${getSeprateDateTime(appointment.dateTime, false)}',
-                    style: TextStyle(color: Colors.black54, fontSize: fontSize),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 16),
-            Column(
+      clipBehavior: Clip.antiAlias,
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildAddReportsButton(appointment, fontSize),
-                const SizedBox(height: 8),
-                _buildPaymentButton(appointment, fontSize)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Name: ${appointment.patientName}',
+                          style: TextStyle(
+                              fontSize: fontSize, fontWeight: FontWeight.bold)),
+                      // const SizedBox(height: 8),
+                      Text(
+                        'Date: ${getSeprateDateTime(appointment.dateTime, true)}',
+                        style: TextStyle(
+                            color: Colors.black54, fontSize: fontSize),
+                      ),
+                      Text(
+                        'Time: ${getSeprateDateTime(appointment.dateTime, false)}',
+                        style: TextStyle(
+                            color: Colors.black54, fontSize: fontSize),
+                      ),
+                    ],
+                  ),
+                ),
+                /*     Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildAddReportsButton(appointment, fontSize),
+                    // const SizedBox(height: 8),
+                    _buildPaymentButton(appointment, fontSize)
+                  ],
+                ),*/
+                Divider(
+                  height: 1,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ReportScreen(appointment),
+                            ),
+                          );
+                        },
+                        child: Container(
+                            color: Colors.blue.shade50,
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              "Add Report",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.w500),
+                            )),
+                      ),
+                    ),
+                    VerticalDivider(
+                      width: 1,
+                      color: Colors.red,
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          if (!appointment.isPayment) {
+                            await showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  PaymentDialog(appointmentId: appointment.id),
+                            );
+                            await _loadAppointmentDetails();
+                          } /*else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Payment already made.')),
+                            );
+                          }*/
+                        },
+                        child: appointment.isPayment
+                            ? Container(
+                                padding: EdgeInsets.all(8),
+                                color: Colors.green.shade50,
+                                child: Text(
+                                  "Paid",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.w500),
+                                ))
+                            : Container(
+                                padding: EdgeInsets.all(8),
+                                color: Colors.red.shade50,
+                                child: Text(
+                                  "Payment",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.w500),
+                                )),
+                      ),
+                    ),
+                  ],
+                )
               ],
             ),
-          ],
-        ),
+          ),
+          // const SizedBox(width: 16),
+        ],
       ),
     );
   }

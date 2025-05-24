@@ -60,11 +60,8 @@ class _ReportScreenState extends State<ReportScreen> {
           // imageFile = pickedFile;
 
           // Update the base64 string
-          base64String = base64Encode(bytes);
-
-          if (kDebugMode) {
-            print('Base64 String: $base64String');
-          }
+          // base64String = base64Encode(bytes);
+          saveReport(base64Encode(bytes));
         });
       }
     } catch (e) {
@@ -138,31 +135,18 @@ class _ReportScreenState extends State<ReportScreen> {
     }
   }
 
-  Future<void> saveReport() async {
-    if (selectedReport != null && base64String != null) {
-      // var fileLength = (await imageFile!.length()) / 1024;
-
+  Future<void> saveReport(String? imageBase64) async {
+    if (selectedReport != null && imageBase64 != null) {
       setState(() {
         reports.add({
           'name': selectedReport,
-          // 'image': imageFile!.path, // Save the Firebase Storage URL
-          'base64': base64String, // Save the Firebase Storage URL
-          // 'image_name': imageFile!.name,
+          'base64': imageBase64, // Save the Firebase Storage URL
           'image_name':
               "${widget.appointment.patientName.toLowerCase().replaceAll(" ", "")}_${selectedReport!.toLowerCase()}",
-          // 'length': "${fileLength.toStringAsFixed(2)} kb",
         });
 
-        // Show Snackbar before clearing the values
-        // showSnackBar("Report saved: $selectedReport", context);
-
-        // Clear the selected report and image
-        selectedReport = null;
-        // imageFile = null;
+        // selectedReport = null;
         base64String = null;
-      });
-
-      setState(() {
         isLoading = false;
       });
     } else {
@@ -276,12 +260,13 @@ class _ReportScreenState extends State<ReportScreen> {
                 dropdownDecoratorProps: DropDownDecoratorProps(
                   baseStyle: TextStyle(fontSize: 14),
                   dropdownSearchDecoration: InputDecoration(
-                    labelText: selectedReport == null
-                        ? "Select Report name"
-                        : 'Report Name',
+                    // labelText: selectedReport == null
+                    //     ? "Select Report name"
+                    //     : 'Report Name',
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12)),
                     fillColor: Colors.grey[200],
+                    label: Text(selectedReport ?? "Select Report name"),
                     filled: true,
                   ),
                 ),
@@ -292,97 +277,41 @@ class _ReportScreenState extends State<ReportScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            if (base64String == null)
-              Row(
-                children: [
-                  ElevatedButton.icon(
-                    label: const Text('Audiogram Chart',
-                        style: TextStyle(fontSize: 12)),
-                    onPressed: () async {
-                      var audiogram = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (c) => AudioGramChartScreen(
-                                    appointmentModel: widget.appointment,
-                                  )));
-                      if (audiogram != null) {
-                        setState(() {
-                          base64String = audiogram;
-                        });
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 8),
-                      elevation: 4,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  ElevatedButton.icon(
-                    label:
-                        const Text('Gallery', style: TextStyle(fontSize: 12)),
-                    onPressed: () => _pickImage(ImageSource.gallery),
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 8),
-                      elevation: 4,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              )
-            else
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => _pickImage(ImageSource.gallery),
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: (base64String != null
-                            ? Image.memory(
-                                base64Decode(base64String!),
-                                width: isDesktop ? 120 : 80,
-                                height: 50,
-                                fit: BoxFit.cover,
-                              )
-                            : const Icon(Icons.image,
-                                size: 50, color: Colors.grey))
-                        // : (imageFile != null
-                        //     ? Image.file(
-                        //         File(imageFile!.path),
-                        //         width: isDesktop ? 120 : 80,
-                        //         height: 50,
-                        //         fit: BoxFit.cover,
-                        //       )
-                        //     : const Icon(Icons.image,
-                        //         size: 50, color: Colors.grey)),
-                        ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              ),
-            SizedBox(
-              width: 8,
-            ),
-            ElevatedButton.icon(
-              label: const Text('Save', style: TextStyle(fontSize: 12)),
-              onPressed: saveReport,
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            // if (base64String == null)
+            Row(
+              children: [
+                IconButton.outlined(
+                  onPressed: () async {
+                    if (selectedReport == null) {
+                      showSnackBar("Please select the report name.", context);
+                      return;
+                    }
+                    var audiogram = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (c) => AudioGramChartScreen(
+                                  appointmentModel: widget.appointment,
+                                )));
+                    if (audiogram != null) {
+                      saveReport(audiogram);
+                    }
+                  },
+                  icon: Icon(Icons.multitrack_audio),
+                  style: IconButton.styleFrom(),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                elevation: 4,
-              ),
-            ),
+                IconButton.outlined(
+                  onPressed: () {
+                    if (selectedReport == null) {
+                      showSnackBar("Please select the report name.", context);
+                      return;
+                    }
+                    _pickImage(ImageSource.gallery);
+                  },
+                  icon: Icon(Icons.photo),
+                  style: IconButton.styleFrom(),
+                ),
+              ],
+            )
           ],
         ),
         const SizedBox(height: 20),

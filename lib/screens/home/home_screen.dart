@@ -50,9 +50,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
-      builder: (context,sizingInformation) {
-        double fontSize = sizingInformation.deviceScreenType == DeviceScreenType.Desktop ? 18 : 16; // Adjust font size based on device
-        double navItemFontSize = sizingInformation.deviceScreenType == DeviceScreenType.Desktop ? 16 : 14; // Navigation item font size
+      builder: (context, sizingInformation) {
+        double fontSize =
+            sizingInformation.deviceScreenType == DeviceScreenType.Desktop
+                ? 18
+                : 16; // Adjust font size based on device
+        double navItemFontSize =
+            sizingInformation.deviceScreenType == DeviceScreenType.Desktop
+                ? 16
+                : 14; // Navigation item font size
 
         return Scaffold(
           key: _scaffoldKey,
@@ -77,14 +83,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 automaticallyImplyLeading: false,
                 leading: !isDesktop
                     ? IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white),
-                  onPressed: () {
-                    _scaffoldKey.currentState?.openDrawer();
-                  },
-                )
+                        icon: const Icon(Icons.menu, color: Colors.white),
+                        onPressed: () {
+                          _scaffoldKey.currentState?.openDrawer();
+                        },
+                      )
                     : null,
               ),
-            ),
+              ),
           ),
           drawer: (isTablet || isMobile ? _buildDrawer() : null),
           backgroundColor: Colors.white,
@@ -108,7 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: SafeArea(
         left: false,
         right: false,
-        child: SingleChildScrollView( // Make the entire column scrollable
+        child: SingleChildScrollView(
+          // Make the entire column scrollable
           child: Column(
             // crossAxisAlignment: CrossAxisAlignment.start,mainAxisAlignment: MainAxisAlignment.start,
             // mainAxisSize: MainAxisSize.min,
@@ -116,15 +123,19 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(height: isDesktop ? 20 : 14),
               _buildNavItem(Icons.home, "Home", 0, navItemFontSize),
               SizedBox(height: isDesktop ? 20 : 14),
-              _buildNavItem(Icons.person_2_rounded, 'Profile', 1, navItemFontSize),
+              _buildNavItem(
+                  Icons.person_2_rounded, 'Profile', 1, navItemFontSize),
               SizedBox(height: isDesktop ? 20 : 14),
-              _buildNavItem(Icons.person_add, "Create Patient", 2, navItemFontSize),
+              _buildNavItem(
+                  Icons.person_add, "Create Patient", 2, navItemFontSize),
               SizedBox(height: isDesktop ? 20 : 14),
-              _buildNavItem(Icons.history, "History of Patients", 3, navItemFontSize),
+              _buildNavItem(
+                  Icons.history, "History of Patients", 3, navItemFontSize),
               SizedBox(height: isDesktop ? 20 : 14),
               _buildNavItem(Icons.person, 'Reference', 4, navItemFontSize),
               SizedBox(height: isDesktop ? 20 : 14),
-              _buildNavItem(Icons.exit_to_app, "Sign Out", 5, navItemFontSize, isSignOut: true),
+              _buildNavItem(Icons.exit_to_app, "Sign Out", 5, navItemFontSize,
+                  isSignOut: true),
               SizedBox(height: isDesktop ? 20 : 14),
               // Container(alignment: Alignment.bottomRight,
               //   child: const Padding(
@@ -148,7 +159,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String title, int index, double fontSize, {bool isSignOut = false}) {
+  Widget _buildNavItem(IconData icon, String title, int index, double fontSize,
+      {bool isSignOut = false}) {
     bool isSelected = _selectedIndex == index;
     return InkWell(
       onTap: () {
@@ -167,11 +179,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      BlocProvider.of<SignInBloc>(context).add(SignOutRequested());
+                      BlocProvider.of<SignInBloc>(context)
+                          .add(SignOutRequested());
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (ctx) => const SignInScreen()),
-                            (Route<dynamic> route) => false,
+                        MaterialPageRoute(
+                            builder: (ctx) => const SignInScreen()),
+                        (Route<dynamic> route) => false,
                       );
                     },
                     child: const Text("Yes"),
@@ -188,10 +202,10 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           gradient: isSelected
               ? const LinearGradient(
-            colors: [Colors.blue, Colors.green],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          )
+                  colors: [Colors.blue, Colors.green],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
               : null,
           color: isSelected ? null : Colors.white,
           border: Border.all(
@@ -210,7 +224,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   title,
                   style: TextStyle(
                     color: isSelected ? Colors.white : Colors.grey,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                     fontSize: fontSize, // Responsive font size
                   ),
                 ),
