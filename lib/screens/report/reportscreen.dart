@@ -211,159 +211,161 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   Widget _buildResponsiveContent(double width) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 16),
-        buildTextField(
-            controller: nameController,
-            labelText: 'Name',
-            readOnly: true,
-            obscureText: false),
-        const SizedBox(height: 16),
-        buildTextField(
-            controller: ageController,
-            labelText: 'Age',
-            readOnly: true,
-            obscureText: false),
-        const SizedBox(height: 16),
-        buildTextField(
-            controller: mobileController,
-            labelText: 'Mobile',
-            readOnly: true,
-            obscureText: false),
-        const SizedBox(height: 16),
-        buildTextField(
-            controller: addressController,
-            labelText: 'Address',
-            readOnly: true,
-            obscureText: false),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: DropdownSearch<ReportNameAddModel>(
-                key: dropDownKey,
-                items: reportNames,
-                //(filter, loadProps) {
-                //   return reportNames.where((report){ return report.report_name.isNotEmpty;}).toList();
-                // },
-                onChanged: (value) {
-                  setState(() {
-                    selectedReport = value?.report_name;
-                  });
-                },
-                compareFn: (item1, item2) => item1.id == item2.id,
-                itemAsString: (reportName) => reportName.report_name,
-                dropdownDecoratorProps: DropDownDecoratorProps(
-                  baseStyle: TextStyle(fontSize: 14),
-                  dropdownSearchDecoration: InputDecoration(
-                    // labelText: selectedReport == null
-                    //     ? "Select Report name"
-                    //     : 'Report Name',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    fillColor: Colors.grey[200],
-                    label: Text(selectedReport ?? "Select Report name"),
-                    filled: true,
+    return SafeArea(bottom: true,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 16),
+          buildTextField(
+              controller: nameController,
+              labelText: 'Name',
+              readOnly: true,
+              obscureText: false),
+          const SizedBox(height: 16),
+          buildTextField(
+              controller: ageController,
+              labelText: 'Age',
+              readOnly: true,
+              obscureText: false),
+          const SizedBox(height: 16),
+          buildTextField(
+              controller: mobileController,
+              labelText: 'Mobile',
+              readOnly: true,
+              obscureText: false),
+          const SizedBox(height: 16),
+          buildTextField(
+              controller: addressController,
+              labelText: 'Address',
+              readOnly: true,
+              obscureText: false),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: DropdownSearch<ReportNameAddModel>(
+                  key: dropDownKey,
+                  items: reportNames,
+                  //(filter, loadProps) {
+                  //   return reportNames.where((report){ return report.report_name.isNotEmpty;}).toList();
+                  // },
+                  onChanged: (value) {
+                    setState(() {
+                      selectedReport = value?.report_name;
+                    });
+                  },
+                  compareFn: (item1, item2) => item1.id == item2.id,
+                  itemAsString: (reportName) => reportName.report_name,
+                  dropdownDecoratorProps: DropDownDecoratorProps(
+                    baseStyle: TextStyle(fontSize: 14),
+                    dropdownSearchDecoration: InputDecoration(
+                      // labelText: selectedReport == null
+                      //     ? "Select Report name"
+                      //     : 'Report Name',
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      fillColor: Colors.grey[200],
+                      label: Text(selectedReport ?? "Select Report name"),
+                      filled: true,
+                    ),
+                  ),
+                  popupProps: const PopupProps.menu(
+                    fit: FlexFit.loose,
+                    constraints: BoxConstraints(),
                   ),
                 ),
-                popupProps: const PopupProps.menu(
-                  fit: FlexFit.loose,
-                  constraints: BoxConstraints(),
-                ),
               ),
+              const SizedBox(width: 8),
+              // if (base64String == null)
+              Row(
+                children: [
+                  IconButton.outlined(
+                    onPressed: () async {
+                      if (selectedReport == null) {
+                        showSnackBar("Please select the report name.", context);
+                        return;
+                      }
+                      var audiogram = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (c) => AudioGramChartScreen(
+                                    appointmentModel: widget.appointment,
+                                  )));
+                      if (audiogram != null) {
+                        saveReport(audiogram);
+                      }
+                    },
+                    icon: Icon(Icons.multitrack_audio),
+                    style: IconButton.styleFrom(),
+                  ),
+                  IconButton.outlined(
+                    onPressed: () {
+                      if (selectedReport == null) {
+                        showSnackBar("Please select the report name.", context);
+                        return;
+                      }
+                      _pickImage(ImageSource.gallery);
+                    },
+                    icon: Icon(Icons.photo),
+                    style: IconButton.styleFrom(),
+                  ),
+                ],
+              )
+            ],
+          ),
+          const SizedBox(height: 20),
+          if (reports.isNotEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Text("Selected reports:"),
             ),
-            const SizedBox(width: 8),
-            // if (base64String == null)
-            Row(
-              children: [
-                IconButton.outlined(
-                  onPressed: () async {
-                    if (selectedReport == null) {
-                      showSnackBar("Please select the report name.", context);
-                      return;
-                    }
-                    var audiogram = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (c) => AudioGramChartScreen(
-                                  appointmentModel: widget.appointment,
-                                )));
-                    if (audiogram != null) {
-                      saveReport(audiogram);
-                    }
-                  },
-                  icon: Icon(Icons.multitrack_audio),
-                  style: IconButton.styleFrom(),
-                ),
-                IconButton.outlined(
-                  onPressed: () {
-                    if (selectedReport == null) {
-                      showSnackBar("Please select the report name.", context);
-                      return;
-                    }
-                    _pickImage(ImageSource.gallery);
-                  },
-                  icon: Icon(Icons.photo),
-                  style: IconButton.styleFrom(),
-                ),
-              ],
-            )
-          ],
-        ),
-        const SizedBox(height: 20),
-        if (reports.isNotEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: Text("Selected reports:"),
-          ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: reports.length,
-            itemBuilder: (context, index) {
-              final report = reports[index];
-              return Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: ListTile(
-                  trailing: IconButton(
-                      onPressed: () => removeAddedReportFromList(index),
-                      icon: const Icon(Icons.close)),
-                  leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: report["base64"] != null
-                          ? Image.memory(
-                              base64Decode(report["base64"]),
-                              width: 120,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.file(
-                              File(report["image"]),
-                              width: 120,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            )),
-                  title: Text(report['name']),
-                  // subtitle: Text(report['length']),
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 20),
-        isLoading
-            ? const AppLoadingIndicator()
-            : Center(
-                child: GradientButton(
+          Expanded(
+            child: ListView.builder(
+              itemCount: reports.length,
+              itemBuilder: (context, index) {
+                final report = reports[index];
+                return Padding(
                   padding: const EdgeInsets.all(12.0),
-                  text: 'Submit Reports',
-                  onPressed: submitReportData,
+                  child: ListTile(
+                    trailing: IconButton(
+                        onPressed: () => removeAddedReportFromList(index),
+                        icon: const Icon(Icons.close)),
+                    leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: report["base64"] != null
+                            ? Image.memory(
+                                base64Decode(report["base64"]),
+                                width: 120,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.file(
+                                File(report["image"]),
+                                width: 120,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              )),
+                    title: Text(report['name']),
+                    // subtitle: Text(report['length']),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 20),
+          isLoading
+              ? const AppLoadingIndicator()
+              : Center(
+                  child: GradientButton(
+                    padding: const EdgeInsets.all(12.0),
+                    text: 'Submit Reports',
+                    onPressed: submitReportData,
+                  ),
                 ),
-              ),
-      ],
+        ],
+      ),
     );
   }
 

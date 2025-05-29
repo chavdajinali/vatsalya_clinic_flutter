@@ -82,17 +82,19 @@ class _AudioGramChartScreenState extends State<AudioGramChartScreen> {
         padding: const EdgeInsets.all(16),
         scrollDirection: Axis.vertical,
 
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // const SizedBox(height: 16),
-            _buildDataTable(),
-            _buildChart(),
-            const SizedBox(height: 16),
-            _buildSubmitButton(),
-            const SizedBox(height: 16),
-            _buildDownloadButton(),
-          ],
+        child: SafeArea(bottom: true,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // const SizedBox(height: 16),
+              _buildDataTable(),
+              _buildChart(),
+              const SizedBox(height: 16),
+              _buildSubmitButton(),
+              const SizedBox(height: 16),
+              _buildDownloadButton(),
+            ],
+          ),
         ),
       ),
     );

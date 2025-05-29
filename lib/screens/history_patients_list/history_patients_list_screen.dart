@@ -72,6 +72,7 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       // Date Range Picker Button
+                                      SizedBox(width: 10),
                                       ElevatedButton(
                                         onPressed: () async {
                                           DateTimeRange? pickedRange =
@@ -132,9 +133,9 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                                 Icons.filter_alt,
                                                 color: Colors.white,
                                               ),
-                                              Text("Filter",
-                                                  style: TextStyle(
-                                                      color: Colors.white))
+                                              // Text("Filter",
+                                              //     style: TextStyle(
+                                              //         color: Colors.white))
                                             ]),
                                           ),
                                         ),
@@ -169,12 +170,12 @@ class _HistoryPatientsListScreenState extends State<HistoryPatientsListScreen> {
                                                 horizontal: 4.0, vertical: 6),
                                             child: Row(children: [
                                               Icon(
-                                                Icons.refresh,
+                                                Icons.cancel,
                                                 color: Colors.white,
                                               ),
-                                              Text("Reset",
-                                                  style: TextStyle(
-                                                      color: Colors.white))
+                                              // Text("Reset",
+                                              //     style: TextStyle(
+                                              //         color: Colors.white))
                                             ]),
                                           ),
                                         ),
