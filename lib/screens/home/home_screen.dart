@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       )
                     : null,
               ),
-              ),
+            ),
           ),
           drawer: (isTablet || isMobile ? _buildDrawer() : null),
           backgroundColor: Colors.white,

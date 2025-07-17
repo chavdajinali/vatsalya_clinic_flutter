@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vatsalya_clinic/models/appointment_model.dart';
 import 'package:vatsalya_clinic/models/user_model.dart';
 import 'package:vatsalya_clinic/screens/graph/audio_gram_chart_screen.dart';
 import 'package:vatsalya_clinic/screens/home/home_screen.dart';
@@ -75,7 +76,9 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         title: "Vatsalya clinic",
         debugShowCheckedModeBanner: false,
-        // home: AudioGramChartScreen(),
+        // home: AudioGramChartScreen(
+        //   appointmentModel: AppointmentModel.fromJson({}),
+        // ),
         home: (widget.loginDetails.email.isNotEmpty)
             ? const HomeScreen()
             : const SignInScreen(),

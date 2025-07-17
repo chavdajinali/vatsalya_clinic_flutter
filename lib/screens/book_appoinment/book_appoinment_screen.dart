@@ -219,7 +219,9 @@ class _BookAppointmentScreenState extends State<BookAppoinmentScreen> {
                               return DropdownMenuItem<String>(
                                 value: option,
                                 child: Text(option,
-                                    style: TextStyle(fontSize: 16,fontWeight: FontWeight.normal)),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal)),
                               );
                             }).toList(),
                             onChanged: (String? newValue) {

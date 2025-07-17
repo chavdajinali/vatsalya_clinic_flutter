@@ -319,7 +319,7 @@ class _ReportScreenState extends State<ReportScreen> {
           if (reports.isNotEmpty)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: Text("Selected reports:"),
+              child: Text("Selected reports:",style: TextStyle(fontWeight: FontWeight.bold),),
             ),
           Expanded(
             child: ListView.builder(

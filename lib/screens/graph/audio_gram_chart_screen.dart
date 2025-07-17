@@ -13,6 +13,8 @@ import 'package:vatsalya_clinic/models/report_name_add_model.dart';
 import 'package:vatsalya_clinic/utils/app_utils.dart';
 import 'package:vatsalya_clinic/utils/gradient_button.dart';
 import 'package:vatsalya_clinic/utils/storeLoginDetails.dart';
+import 'package:vatsalya_clinic/utils/ReusableCheckbox.dart';
+import 'package:vatsalya_clinic/utils/textfield_builder.dart';
 
 import '../../utils/audio_gram_pdf_generator.dart';
 
@@ -36,12 +38,26 @@ class _AudioGramChartScreenState extends State<AudioGramChartScreen> {
     (i) => List.generate(8, (j) => TextEditingController()),
   );
 
-  final List<double> hzValue = [125, 250, 500, 1000, 2000, 4000, 8000];
+  // final List<double> hzValue = [125, 250, 500, 1000, 2000, 4000, 8000];
   final List<LineChartBarData> chartData = [];
 
   bool isLoading = false;
   final double _cellHeight = 30.0;
   final double _fontSize = 10.0;
+
+  bool isGood = false;
+  bool isFair = false;
+  bool isPoor = false;
+
+  bool isInventis = false;
+  bool isInteracoustic = false;
+  bool isENTConsultation = false;
+  bool isCaresOfEars = false;
+  bool isHAT = false;
+  bool isFollowUp = false;
+
+  final TextEditingController rightEarController = TextEditingController();
+  final TextEditingController leftEarController = TextEditingController();
 
   @override
   void initState() {
@@ -81,16 +97,20 @@ class _AudioGramChartScreenState extends State<AudioGramChartScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         scrollDirection: Axis.vertical,
-
-        child: SafeArea(bottom: true,
+        child: SafeArea(
+          bottom: true,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // const SizedBox(height: 16),
               _buildDataTable(),
+              const SizedBox(height: 32),
+
               _buildChart(),
               const SizedBox(height: 16),
+
               _buildSubmitButton(),
+
               const SizedBox(height: 16),
               _buildDownloadButton(),
             ],
@@ -100,9 +120,177 @@ class _AudioGramChartScreenState extends State<AudioGramChartScreen> {
     );
   }
 
+  Widget _buildGraphOtherData() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              "Reliability : ",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            ReusableCheckbox(
+              value: isGood,
+              onChanged: (value) {
+                setState(() {
+                  isGood = value ?? false;
+                });
+              },
+              label: "Good",
+            ),
+            ReusableCheckbox(
+              value: isFair,
+              onChanged: (value) {
+                setState(() {
+                  isFair = value ?? false;
+                });
+              },
+              label: "Fair",
+            ),
+            ReusableCheckbox(
+              value: isPoor,
+              onChanged: (value) {
+                setState(() {
+                  isPoor = value ?? false;
+                });
+              },
+              label: "Poor",
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 16,
+        ),
+        Row(
+          children: [
+            Text(
+              "Audiometer Used : ",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            ReusableCheckbox(
+              value: isInventis,
+              onChanged: (value) {
+                setState(() {
+                  isInventis = value ?? false;
+                });
+              },
+              label: "Inventis",
+            ),
+            ReusableCheckbox(
+              value: isInteracoustic,
+              onChanged: (value) {
+                setState(() {
+                  isInteracoustic = value ?? false;
+                });
+              },
+              label: "Interacoustic",
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 16,
+        ),
+        Text(
+          "Audiological Interpreration :",
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.underline),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        Row(
+          children: [
+            SizedBox(
+                width: 100,
+                child: Text(
+                  "Right Ear :",
+                  style:
+                      TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                )),
+            Expanded(
+                child: TextFormField(
+              decoration: InputDecoration(border: UnderlineInputBorder()),
+              controller: rightEarController,
+            ))
+          ],
+        ),
+        SizedBox(
+          height: 16,
+        ),
+        Row(
+          children: [
+            SizedBox(
+                width: 100,
+                child: Text(
+                  "Left Ear :",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.blue),
+                )),
+            Expanded(
+                child: TextFormField(
+              decoration: InputDecoration(border: UnderlineInputBorder()),
+              controller: leftEarController,
+            ))
+          ],
+        ),
+        SizedBox(
+          height: 16,
+        ),
+        Wrap(
+          direction: Axis.horizontal,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              "Recommendation : ",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            ReusableCheckbox(
+              value: isENTConsultation,
+              onChanged: (value) {
+                setState(() {
+                  isENTConsultation = value ?? false;
+                });
+              },
+              label: "ENT Consultation",
+            ),
+            ReusableCheckbox(
+              value: isCaresOfEars,
+              onChanged: (value) {
+                setState(() {
+                  isCaresOfEars = value ?? false;
+                });
+              },
+              label: "Care of Ears",
+            ),
+            ReusableCheckbox(
+              value: isHAT,
+              onChanged: (value) {
+                setState(() {
+                  isHAT = value ?? false;
+                });
+              },
+              label: "HAT",
+            ),
+            ReusableCheckbox(
+              value: isFollowUp,
+              onChanged: (value) {
+                setState(() {
+                  isFollowUp = value ?? false;
+                });
+              },
+              label: "Follow Up",
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildDataTable() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start  ,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: SingleChildScrollView(
@@ -211,52 +399,107 @@ class _AudioGramChartScreenState extends State<AudioGramChartScreen> {
   Widget _buildChart() {
     return RepaintBoundary(
       key: _chartKey,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 32),
-        child: AspectRatio(
-          aspectRatio:isMobile?1.0:2.0,
-          child: LineChart(
-            LineChartData(
-              gridData: FlGridData(show: true),
-              titlesData: FlTitlesData(
-                leftTitles: AxisTitles(
-                  axisNameWidget: Text(
-                    "Hearing Threshold Level in (dB)",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                  axisNameSize: 40,
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    interval: 10,
-                    getTitlesWidget: (value, _) => Text('${value.toInt()}',
-                        style: const TextStyle(fontSize: 10)),
+      child: SizedBox(
+        width: 700,
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: 600,
+                      height: 600,
+                      child: LineChart(
+                        LineChartData(
+                          gridData: FlGridData(
+                            show: true,
+                          ),
+                          titlesData: FlTitlesData(
+                            leftTitles: AxisTitles(
+                              axisNameWidget: Text(
+                                "Hearing Threshold Level in (dB)",
+                                style: TextStyle(fontSize: 12),
+                              ),
+                              axisNameSize: 40,
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                interval: 10,
+                                getTitlesWidget: (value, _) => Text(
+                                  '${120 - value.toInt()}',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            topTitles: AxisTitles(
+                              axisNameWidget: Text(
+                                "Test Frequencies in (Hz)",
+                                style: TextStyle(fontSize: 12),
+                              ),
+                              axisNameSize: 30,
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                interval: 1,
+                                getTitlesWidget: (value, _) {
+                                  switch (value.toInt()) {
+                                    case 0:
+                                      return Text('0',
+                                          style: TextStyle(fontSize: 10));
+                                    case 1:
+                                      return Text('250Hz',
+                                          style: TextStyle(fontSize: 10));
+                                    case 2:
+                                      return Text('500Hz',
+                                          style: TextStyle(fontSize: 10));
+                                    case 3:
+                                      return Text('1KHz',
+                                          style: TextStyle(fontSize: 10));
+                                    case 4:
+                                      return Text('2KHz',
+                                          style: TextStyle(fontSize: 10));
+                                    case 5:
+                                      return Text('4KHz',
+                                          style: TextStyle(fontSize: 10));
+                                    case 6:
+                                      return Text('8KHz',
+                                          style: TextStyle(fontSize: 10));
+                                    default:
+                                      return SizedBox.shrink();
+                                  }
+                                },
+                              ),
+                            ),
+                            bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                              axisNameSize: 30,
+                              axisNameWidget: Text(
+                                "Test Frequencies in (Hz)",
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            rightTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: false)),
+                          ),
+                          lineBarsData: chartData,
+                          borderData: FlBorderData(show: true),
+                          minX: 0,
+                          maxX: 6,
+                          minY: -10,
+                          maxY: 130,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                bottomTitles: AxisTitles(
-                  axisNameWidget: Text(
-                    "Frequency (Hz)",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    interval: 1000,
-                    getTitlesWidget: (value, _) => Text('${value.toInt()}hz',
-                        style: const TextStyle(fontSize: 10)),
-                  ),
-                ),
-                topTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              ),
-              lineBarsData: chartData,
-              borderData: FlBorderData(show: true),
-              minX: 0,
-              maxX: 8000,
-              minY: 0,
-              maxY: 130,
+              ],
             ),
-          ),
+            const SizedBox(height: 16),
+            _buildGraphOtherData()
+          ],
         ),
       ),
     );
@@ -280,20 +523,34 @@ class _AudioGramChartScreenState extends State<AudioGramChartScreen> {
 
   void onDataChanged() {
     final rowConfigs = [
-      {'color': Colors.blue, 'symbol': 'X'}, // 0 - Left AC
-      {'color': Colors.red, 'symbol': 'O'}, // 1 - Right AC
-      {'color': Colors.blue, 'symbol': '>'}, // 2 - Left BC
-      {'color': Colors.red, 'symbol': '<'}, // 3 - Right BC
-      {'color': Colors.blue, 'symbol': '□'}, // 4 - Left AC Masked
-      {'color': Colors.red, 'symbol': '△'}, // 5 - Right AC Masked
-      {'color': Colors.blue, 'symbol': ']'}, // 6 - Left BC Masked
-      {'color': Colors.red, 'symbol': '['}, // 7 - Right BC Masked
-      {'color': Colors.red, 'symbol': 'O↓'}, // 8 - Right AC N.R
-      {'color': Colors.blue, 'symbol': 'X↓'}, // 9 - Left AC N.R
-      {'color': Colors.red, 'symbol': '[↓]'}, // 10 - Right BC N.R
-      {'color': Colors.blue, 'symbol': ']↓'}, // 11 - Left BC N.R
-      {'color': Colors.red, 'symbol': '△↓'}, // 12 - Right AC Masked N.R.
-      {'color': Colors.blue, 'symbol': '□↓'}, // 13 - Left AC Masked N.R.
+      {'color': Colors.blue, 'symbol': 'X', 'line': 1},
+      // 0 - Left AC
+      {'color': Colors.red, 'symbol': 'O', 'line': 1},
+      // 1 - Right AC
+      {'color': Colors.blue, 'symbol': '>', 'line': 2},
+      // 2 - Left BC
+      {'color': Colors.red, 'symbol': '<', 'line': 2},
+      // 3 - Right BC
+      {'color': Colors.blue, 'symbol': '□', 'line': 1},
+      // 4 - Left AC Masked
+      {'color': Colors.red, 'symbol': '△', 'line': 1},
+      // 5 - Right AC Masked
+      {'color': Colors.blue, 'symbol': ']', 'line': 2},
+      // 6 - Left BC Masked
+      {'color': Colors.red, 'symbol': '[', 'line': 2},
+      // 7 - Right BC Masked
+      {'color': Colors.red, 'symbol': 'O↓', 'line': 0},
+      // 8 - Right AC N.R
+      {'color': Colors.blue, 'symbol': 'X↓', 'line': 0},
+      // 9 - Left AC N.R
+      {'color': Colors.red, 'symbol': '[↓]', 'line': 0},
+      // 10 - Right BC N.R
+      {'color': Colors.blue, 'symbol': ']↓', 'line': 0},
+      // 11 - Left BC N.R
+      {'color': Colors.red, 'symbol': '△↓', 'line': 0},
+      // 12 - Right AC Masked N.R.
+      {'color': Colors.blue, 'symbol': '□↓', 'line': 0},
+      // 13 - Left AC Masked N.R.
     ];
 
     chartData.clear();
@@ -304,15 +561,14 @@ class _AudioGramChartScreenState extends State<AudioGramChartScreen> {
       for (var col = 0; col < _controllers[row].length; col++) {
         final text = _controllers[row][col].text.trim();
         if (text.isNotEmpty) {
-          spots.add(FlSpot(hzValue[col], double.parse(text)));
+          spots.add(FlSpot(col.toDouble(), 120 - double.parse(text)));
         }
       }
 
       if (spots.isNotEmpty && row < rowConfigs.length) {
         chartData.add(_buildLineData(
           spots,
-          rowConfigs[row]["color"] as Color,
-          rowConfigs[row]['symbol'] as String,
+          rowConfigs[row],
         ));
       }
     }
@@ -320,17 +576,18 @@ class _AudioGramChartScreenState extends State<AudioGramChartScreen> {
     setState(() {});
   }
 
-  LineChartBarData _buildLineData(
-      List<FlSpot> spots, Color color, String symbol) {
+  LineChartBarData _buildLineData(List<FlSpot> spots, Map config) {
     return LineChartBarData(
       spots: spots,
       isCurved: false,
-      color: color,
+      color: config["line"] == 0 ? Colors.transparent : config["color"],
       barWidth: 2,
+      dashArray: config["line"] == 2 ? [5] : null,
       dotData: FlDotData(
         show: true,
         getDotPainter: (spot, percent, barData, index) {
-          return FlTextPainter(symbol: symbol, color: color);
+          return FlTextPainter(
+              symbol: config["symbol"], color: config["color"]);
         },
         checkToShowDot: (spot, barData) => true,
       ),
@@ -415,7 +672,7 @@ class FlTextPainter extends FlDotPainter {
       text: TextSpan(
           text: symbol,
           style: TextStyle(
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.transparent,
               color: color,
               fontSize: fontSize,
               fontWeight: FontWeight.bold)),

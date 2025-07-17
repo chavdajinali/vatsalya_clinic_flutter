@@ -92,8 +92,8 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
     return ResponsiveBuilder(
       builder: (context, sizingInformation) {
         double titleFontSize = getFontSize(sizingInformation, 24, 18, 16);
-        double buttonFontSize = getFontSize(sizingInformation, 16, 14, 12);
-        double cardFontSize = getFontSize(sizingInformation, 16, 14, 12);
+        double buttonFontSize = getFontSize(sizingInformation, 16, 14, 14);
+        double cardFontSize = getFontSize(sizingInformation, 16, 14, 14);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,6 +191,7 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
       color: Colors.white,
       clipBehavior: Clip.antiAlias,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: Column(
@@ -205,11 +206,11 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                           style: TextStyle(
                               fontSize: fontSize, fontWeight: FontWeight.bold)),
                       // const SizedBox(height: 8),
-                      Text(
+        /*              Text(
                         'Date: ${getSeprateDateTime(appointment.dateTime, true)}',
                         style: TextStyle(
                             color: Colors.black54, fontSize: fontSize),
-                      ),
+                      ),*/
                       Text(
                         'Time: ${getSeprateDateTime(appointment.dateTime, false)}',
                         style: TextStyle(
@@ -218,91 +219,73 @@ class _TodaysAppointmentPageState extends State<TodaysAppointmentPage> {
                     ],
                   ),
                 ),
-                /*     Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                /*              Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _buildAddReportsButton(appointment, fontSize),
                     // const SizedBox(height: 8),
                     _buildPaymentButton(appointment, fontSize)
                   ],
                 ),*/
-                Divider(
-                  height: 1,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ReportScreen(appointment),
-                            ),
-                          );
-                        },
-                        child: Container(
-                            color: Colors.blue.shade50,
-                            padding: EdgeInsets.all(8),
-                            child: Text(
-                              "Add Report",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.w500),
-                            )),
-                      ),
-                    ),
-                    VerticalDivider(
-                      width: 1,
-                      color: Colors.red,
-                    ),
-                    Expanded(
-                      child: InkWell(
-                        onTap: () async {
-                          if (!appointment.isPayment) {
-                            await showDialog(
-                              context: context,
-                              builder: (context) =>
-                                  PaymentDialog(appointmentId: appointment.id),
-                            );
-                            await _loadAppointmentDetails();
-                          } /*else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Payment already made.')),
-                            );
-                          }*/
-                        },
-                        child: appointment.isPayment
-                            ? Container(
-                                padding: EdgeInsets.all(8),
-                                color: Colors.green.shade50,
-                                child: Text(
-                                  "Paid",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.w500),
-                                ))
-                            : Container(
-                                padding: EdgeInsets.all(8),
-                                color: Colors.red.shade50,
-                                child: Text(
-                                  "Payment",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.w500),
-                                )),
-                      ),
-                    ),
-                  ],
-                )
-              ],
+                ],
             ),
           ),
+          Row(
+            children: [
+              InkWell(
+                customBorder: CircleBorder(),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReportScreen(appointment),
+                    ),
+                  );
+                },
+                child: Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.grey.shade300)),
+                    child: Icon(
+                      Icons.note_add,
+                      color: Colors.blue,
+                    )),
+              ),
+              SizedBox(
+                width: 8,
+              ),
+              InkWell(
+                customBorder: CircleBorder(),
+                onTap: appointment.isPayment
+                    ? null
+                    : () async {
+                        if (!appointment.isPayment) {
+                          await showDialog(
+                            context: context,
+                            builder: (context) =>
+                                PaymentDialog(appointmentId: appointment.id),
+                          );
+                          await _loadAppointmentDetails();
+                        }
+                      },
+                child: Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.grey.shade300)),
+                    child: Icon(
+                      Icons.currency_rupee,
+                      color: appointment.isPayment?Colors.green:Colors.red,
+                    )),
+              ),
+              SizedBox(
+                width: 8,
+              ),
+            ],
+          ),
+
+          // Icon(Icons.currency_rupee)
           // const SizedBox(width: 16),
         ],
       ),
